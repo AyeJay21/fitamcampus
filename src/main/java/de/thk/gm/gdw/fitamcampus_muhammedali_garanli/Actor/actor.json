@@ -1,3 +1,12 @@
 {
-
+  "@context": "https://www.w3.org/ns/activitystreams",
+  "type": "Person",
+  "id": "https://activitypub.alluneedspot.com/users/ayejay",
+  "following": "https://activitypub.alluneedspot.com/users/ayejay/following",
+  "followers": "https://activitypub.alluneedspot.com/users/ayejay/followers",
+  "inbox": "https://activitypub.alluneedspot.com/users/ayejay/inbox",
+  "outbox": "https://activitypub.alluneedspot.com/users/ayejay/outbox",
+  "preferredUsername": "ayejay",
+  "name": "ali",
+  "summary": "Das ist mein Test-Actor für ActivityPub"
 }
