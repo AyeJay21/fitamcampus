@@ -23,7 +23,7 @@ public class OutboxController {
 
     @GetMapping(value = "/users/{username}/outbox", produces = "application/activity+json")
     public ResponseEntity<?> getOutbox(@PathVariable String username) throws IOException {
-        List<Outbox> items = outboxRepository.findAllByActivityJsonContaining(username);
+        List<Outbox> items = outboxRepository.findAll();
 
         List<Map<String,Object>> orderedItems = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
@@ -41,7 +41,9 @@ public class OutboxController {
         return ResponseEntity.ok(outbox);
     }
 
-    @PostMapping
+    @PostMapping(value = "/users/{username}/outbox",
+            consumes = "application/json",
+            produces = "application/activity+json")
     public ResponseEntity<String> postToOutbox(
             @PathVariable String username,
             @RequestBody Map<String, Object> activity) throws IOException {

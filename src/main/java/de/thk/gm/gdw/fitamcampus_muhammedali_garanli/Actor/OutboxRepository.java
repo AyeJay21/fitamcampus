@@ -8,5 +8,5 @@ import java.util.List;
 @Repository
 public interface OutboxRepository extends JpaRepository<Outbox, Long> {
     //List<Outbox> findByUsername(String username);
-    List<Outbox> findAllByActivityJsonContaining(String username);
+    //List<Outbox> findAllByActivityJsonContaining(String username);
 }
