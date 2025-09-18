@@ -1,12 +1,14 @@
 package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.Actor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 
+@Controller
 public class Inbox {
 
     @PostMapping(value = "/users/{username}/inbox", consumes = "application/activity+json")
