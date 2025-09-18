@@ -26,3 +26,5 @@ services:
     restart: always
     volumes:
       - .:/home/gradle/src  # optional für Hot-Reload in Dev
+volumes:
+  db_data:
