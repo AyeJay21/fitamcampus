@@ -1,17 +1,18 @@
 package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.Actor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Controller
 public class Actor {
 
     @GetMapping(value = "/users/{username}", produces = "application/activity+json")
     public ResponseEntity<?> getActor(@PathVariable String username) {
-        // Beispiel: wir lassen nur "ayejay" existieren
         if (!"ayejay".equals(username)) {
             Map<String, Object> error = new HashMap<>();
             error.put("error", "Actor not found");
