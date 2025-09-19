@@ -1,19 +1,40 @@
 package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.Actor;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.*;
 
+import java.io.IOException;
 import java.util.Map;
 
-@Controller
+@Entity
 public class Inbox {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    @PostMapping(value = "/users/{username}/inbox", consumes = "application/activity+json")
-    public ResponseEntity<String> postInbox(@PathVariable String username, @RequestBody Map<String, Object> body) {
-        System.out.println("Inbox received for " + username + ": " + body);
-        return ResponseEntity.accepted().body("Accepted");
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String activityJson;
+
+    @JsonIgnore
+    public void setActivity(Map<String, Object> activity) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        this.activityJson = mapper.writeValueAsString(activity);
+    }
+
+    @JsonIgnore
+    public Map<String, Object> getActivity() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(this.activityJson, Map.class);
+    }
+
+    public String getActivityJson() {
+        return activityJson;
+    }
+
+    public void setActivityJson(String activityJson) {
+        this.activityJson = activityJson;
     }
 }
+

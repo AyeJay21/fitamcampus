@@ -18,8 +18,11 @@ import java.util.Map;
 @Controller
 public class OutboxController {
 
-    @Autowired
-    OutboxRepository outboxRepository;
+    public final OutboxRepository outboxRepository;
+
+    public OutboxController(OutboxRepository outboxRepository){
+        this.outboxRepository = outboxRepository;
+    }
 
     @GetMapping(value = "/users/{username}/outbox", produces = "application/activity+json")
     public ResponseEntity<?> getOutbox(@PathVariable String username) throws IOException {
