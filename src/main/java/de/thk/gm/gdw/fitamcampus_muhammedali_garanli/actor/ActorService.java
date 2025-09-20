@@ -1,0 +1,36 @@
+package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.util.Base64;
+
+@Service
+public class ActorService {
+
+    @Autowired
+    public ActorRepository actorRepository;
+
+    public Actor createActor(String username) throws Exception{
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        keyGen.initialize(2048);
+        KeyPair keyPair = keyGen.generateKeyPair();
+
+        String publicKeyPem = "-----BEGIN PUBLIC KEY-----\n" +
+                Base64.getMimeEncoder().encodeToString(keyPair.getPublic().getEncoded()) +
+                "\n-----END PUBLIC KEY-----";
+
+        String privateKeyPem = "-----BEGIN PRIVATE KEY-----\n" +
+                Base64.getMimeEncoder().encodeToString(keyPair.getPrivate().getEncoded()) +
+                "\n-----END PRIVATE KEY-----";
+
+        Actor actor = new Actor();
+        actor.setUsername(username);
+        actor.setPublicKeyPem(publicKeyPem);
+        actor.setPrivateKeyPem(privateKeyPem);
+
+        return actorRepository.save(actor);
+    }
+}

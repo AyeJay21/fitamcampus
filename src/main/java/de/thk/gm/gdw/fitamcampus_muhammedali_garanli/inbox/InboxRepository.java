@@ -1,4 +1,4 @@
-package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.Actor;
+package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.inbox;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

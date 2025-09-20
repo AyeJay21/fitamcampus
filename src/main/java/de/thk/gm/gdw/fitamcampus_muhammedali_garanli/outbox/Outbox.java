@@ -1,4 +1,4 @@
-package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.Actor;
+package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.outbox;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @Entity
-public class Inbox {
+public class Outbox {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -37,4 +37,3 @@ public class Inbox {
         this.activityJson = activityJson;
     }
 }
-
