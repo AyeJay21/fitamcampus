@@ -41,7 +41,5 @@ public class ActorController {
                         }
                 )
                 .orElseGet(() -> ResponseEntity.status(404).body(Map.of("error", "Actor not found")));
-
     }
-
 }

@@ -31,6 +31,16 @@ public class ActorService {
         actor.setPublicKeyPem(publicKeyPem);
         actor.setPrivateKeyPem(privateKeyPem);
 
+        actor.setInboxUrl("https://activitypub.alluneedspot.com/users/" + username + "/inbox");
+        actor.setOutboxUrl("https://activitypub.alluneedspot.com/users/" + username + "/outbox");
+        actor.setFollowersUrl("https://activitypub.alluneedspot.com/users/" + username + "/followers");
+        actor.setFollowingUrl("https://activitypub.alluneedspot.com/users/" + username + "/following");
+
         return actorRepository.save(actor);
+    }
+
+    public Actor getActorByUsername(String username) {
+        return actorRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Actor not found: " + username));
     }
 }

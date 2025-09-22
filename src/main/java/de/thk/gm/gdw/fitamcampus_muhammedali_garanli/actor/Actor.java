@@ -19,18 +19,80 @@ public class Actor {
     @Lob
     private String publicKeyPem;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    private String inboxUrl;
+    private String outboxUrl;
+    private String followersUrl;
+    private String followingUrl;
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getInboxUrl() {
+        return inboxUrl;
+    }
 
-    public String getDisplayName() { return displayName; }
-    public void setDisplayName(String displayName) { this.displayName = displayName; }
+    public void setInboxUrl(String inboxUrl) {
+        this.inboxUrl = inboxUrl;
+    }
 
-    public String getPublicKeyPem() { return publicKeyPem; }
-    public void setPublicKeyPem(String publicKeyPem) { this.publicKeyPem = publicKeyPem; }
+    public String getOutboxUrl() {
+        return outboxUrl;
+    }
 
-    public String getPrivateKeyPem() { return privateKeyPem; }
-    public void setPrivateKeyPem(String privateKeyPem) { this.privateKeyPem = privateKeyPem; }
+    public void setOutboxUrl(String outboxUrl) {
+        this.outboxUrl = outboxUrl;
+    }
+
+    public String getFollowersUrl() {
+        return followersUrl;
+    }
+
+    public void setFollowersUrl(String followersUrl) {
+        this.followersUrl = followersUrl;
+    }
+
+    public String getFollowingUrl() {
+        return followingUrl;
+    }
+
+    public void setFollowingUrl(String followingUrl) {
+        this.followingUrl = followingUrl;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getPublicKeyPem() {
+        return publicKeyPem;
+    }
+
+    public void setPublicKeyPem(String publicKeyPem) {
+        this.publicKeyPem = publicKeyPem;
+    }
+
+    public String getPrivateKeyPem() {
+        return privateKeyPem;
+    }
+
+    public void setPrivateKeyPem(String privateKeyPem) {
+        this.privateKeyPem = privateKeyPem;
+    }
 }
