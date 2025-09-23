@@ -16,15 +16,20 @@ public class InboxController {
         this.inboxRepository = inboxRepository;
     }
 
-    @GetMapping
+    @GetMapping(produces = "application/json")
     public List<Inbox> getInbox(@PathVariable String username) {
         return inboxRepository.findAll();
     }
 
-    @PostMapping(consumes = "application/json")
+    @PostMapping(consumes = {"application/json", "application/activity+json"})
     public Inbox addToInbox(@PathVariable String username, @RequestBody Map<String, Object> activity) throws Exception {
         Inbox inbox = new Inbox();
         inbox.setActivity(activity);
+        inbox.setUsername(username);
+        inbox.setType((String) activity.get("type"));
+        inbox.setActor((String) activity.get("actor"));
+        inbox.setObjectData(activity.get("object").toString());
+
         return inboxRepository.save(inbox);
     }
 }
