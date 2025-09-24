@@ -15,7 +15,8 @@ public class RemoteActorService {
      * @return Inbox URL des remote Actors
      */
     public String resolveActorInbox(String handle) throws Exception {
-        String[] parts = handle.replace("@", "").split("@");
+        String normalizedHandle = handle.startsWith("@") ? handle.substring(1) : handle;
+        String[] parts = normalizedHandle.split("@");
         if (parts.length != 2) throw new IllegalArgumentException("Invalid handle: " + handle);
 
         String username = parts[0];
