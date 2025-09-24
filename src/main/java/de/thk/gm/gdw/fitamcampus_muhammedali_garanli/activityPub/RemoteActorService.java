@@ -57,4 +57,26 @@ public class RemoteActorService {
 
         throw new RuntimeException("No inbox found for actor: " + actorUrl);
     }
+
+    public String resolveActorUrl(String handle) throws Exception {
+        String normalizedHandle = handle.startsWith("@") ? handle.substring(1) : handle;
+        String[] parts = normalizedHandle.split("@");
+        if (parts.length != 2) throw new IllegalArgumentException("Invalid handle: " + handle);
+
+        String username = parts[0];
+        String domain = parts[1];
+
+        // WebFinger abrufen
+        String webfingerUrl = "https://" + domain + "/.well-known/webfinger?resource=acct:" + username + "@" + domain;
+        WebClient client = WebClient.create(webfingerUrl);
+        String response = client.get().retrieve().bodyToMono(String.class).block();
+
+        JsonNode root = mapper.readTree(response);
+        for (JsonNode link : root.get("links")) {
+            if ("self".equals(link.get("rel").asText()) && "application/activity+json".equals(link.get("type").asText())) {
+                return link.get("href").asText();
+            }
+        }
+        throw new RuntimeException("Actor URL not found for " + handle);
+    }
 }

@@ -31,13 +31,14 @@ public class ActivityPubController {
             String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
 
             String targetInbox = remoteActorService.resolveActorInbox(targetHandle);
+            String targetActorUrl = remoteActorService.resolveActorUrl(targetHandle);
 
             Map<String, Object> follow = new HashMap<>();
             follow.put("@context", "https://www.w3.org/ns/activitystreams");
             follow.put("id", actorId + "/activities/follow-" + java.util.UUID.randomUUID());
             follow.put("type", "Follow");
             follow.put("actor", actorId);
-            follow.put("object", targetHandle);
+            follow.put("object", targetActorUrl);
 
             deliveryService.sendToInbox(targetInbox, follow, actorId, privateKey);
 
