@@ -21,17 +21,39 @@ public class RemoteActorService {
         String username = parts[0];
         String domain = parts[1];
 
+        // 1) WebFinger abrufen
         String webfingerUrl = "https://" + domain + "/.well-known/webfinger?resource=acct:" + username + "@" + domain;
-
         WebClient client = WebClient.create(webfingerUrl);
         String response = client.get().retrieve().bodyToMono(String.class).block();
 
         JsonNode root = mapper.readTree(response);
+        String actorUrl = null;
         for (JsonNode link : root.get("links")) {
-            if (link.has("rel") && "self".equals(link.get("rel").asText())) {
-                return link.get("href").asText(); // Actor-URL
+            if ("self".equals(link.get("rel").asText()) && "application/activity+json".equals(link.get("type").asText())) {
+                actorUrl = link.get("href").asText();
+                break;
             }
         }
-        throw new RuntimeException("Inbox not found for " + handle);
+        if (actorUrl == null) throw new RuntimeException("Actor URL not found for " + handle);
+
+        // 2) Actor-JSON abrufen
+        String actorJson = WebClient.create(actorUrl)
+                .get()
+                .header("Accept", "application/activity+json")
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        JsonNode actorNode = mapper.readTree(actorJson);
+
+        // 3) Inbox oder SharedInbox zurückgeben
+        if (actorNode.has("endpoints") && actorNode.get("endpoints").has("sharedInbox")) {
+            return actorNode.get("endpoints").get("sharedInbox").asText();
+        }
+        if (actorNode.has("inbox")) {
+            return actorNode.get("inbox").asText();
+        }
+
+        throw new RuntimeException("No inbox found for actor: " + actorUrl);
     }
 }
