@@ -14,7 +14,6 @@ import java.util.Map;
 @RestController
 public class ActivityPubController {
 
-
     @Autowired
     private ActorService actorService;
 
@@ -35,7 +34,7 @@ public class ActivityPubController {
 
             Map<String, Object> follow = new HashMap<>();
             follow.put("@context", "https://www.w3.org/ns/activitystreams");
-            follow.put("id", actorId + "/activity/follow-" + java.util.UUID.randomUUID());
+            follow.put("id", actorId + "/activities/follow-" + java.util.UUID.randomUUID());
             follow.put("type", "Follow");
             follow.put("actor", actorId);
             follow.put("object", targetHandle);
