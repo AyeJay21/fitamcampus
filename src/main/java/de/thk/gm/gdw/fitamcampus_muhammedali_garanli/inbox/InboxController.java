@@ -17,12 +17,14 @@ public class InboxController {
     }
 
     @GetMapping(produces = "application/json")
+    @ResponseBody
     public List<Inbox> getInbox(@PathVariable String username) {
         return inboxRepository.findAll();
     }
 
     @PostMapping(consumes = {"application/json", "application/activity+json"})
-    public Inbox addToInbox(@PathVariable String username, @RequestBody Map<String, Object> activity) throws Exception {
+    @ResponseBody
+    public Map<String, Object> addToInbox(@PathVariable String username, @RequestBody Map<String, Object> activity) throws Exception {
         Inbox inbox = new Inbox();
         inbox.setActivity(activity);
         inbox.setUsername(username);
@@ -30,6 +32,13 @@ public class InboxController {
         inbox.setActor((String) activity.get("actor"));
         inbox.setObjectData(activity.get("object").toString());
 
-        return inboxRepository.save(inbox);
+        Inbox saved = inboxRepository.save(inbox);
+        
+        return Map.of(
+            "success", true,
+            "message", "Activity received",
+            "activityType", saved.getType(),
+            "from", saved.getActor()
+        );
     }
 }
