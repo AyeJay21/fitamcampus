@@ -110,8 +110,10 @@ public class ActivityPubController {
         }
     }
 
-    @PostMapping("/activitypub/create-public-post") 
-    public ResponseEntity<?> createPublicPost(@RequestParam String message) {
+    @PostMapping("/activitypub/create-post") 
+    public ResponseEntity<?> createVisiblePost(
+            @RequestParam String message,
+            @RequestParam(required = false) String mentionHandle) {
         try {
             Actor me = actorService.getActorByUsername("ayejay");
             String privateKey = me.getPrivateKeyPem();
@@ -123,20 +125,41 @@ public class ActivityPubController {
             note.put("id", actorId + "/notes/" + java.util.UUID.randomUUID());
             note.put("content", message);
             note.put("attributedTo", actorId);
-            note.put("to", Arrays.asList("https://www.w3.org/ns/activitystreams#Public"));
-            note.put("cc", Arrays.asList("https://activitypub.alluneedspot.com/users/" + me.getUsername() + "/followers"));
-
+            
+            // Create Activity
             Map<String, Object> createActivity = new HashMap<>();
             createActivity.put("@context", "https://www.w3.org/ns/activitystreams");
             createActivity.put("id", actorId + "/activities/create-" + java.util.UUID.randomUUID());
             createActivity.put("type", "Create");
             createActivity.put("actor", actorId);
             createActivity.put("object", note);
-            createActivity.put("to", Arrays.asList("https://www.w3.org/ns/activitystreams#Public"));
-            createActivity.put("cc", Arrays.asList("https://activitypub.alluneedspot.com/users/" + me.getUsername() + "/followers"));
 
-            String sharedInbox = "https://mastodon.social/inbox";
-            deliveryService.sendToInbox(sharedInbox, createActivity, actorId, privateKey);
+            String targetInbox = "https://mastodon.social/inbox";
+            
+            if (mentionHandle != null && !mentionHandle.isEmpty()) {
+                // MIT MENTION (sichtbarer!)
+                String targetActorUrl = remoteActorService.resolveActorUrl(mentionHandle);
+                targetInbox = remoteActorService.resolveActorInbox(mentionHandle);
+                
+                note.put("to", Arrays.asList(targetActorUrl, "https://www.w3.org/ns/activitystreams#Public"));
+                note.put("cc", Arrays.asList("https://www.w3.org/ns/activitystreams#Public"));
+                note.put("tag", Arrays.asList(Map.of(
+                    "type", "Mention",
+                    "href", targetActorUrl,
+                    "name", mentionHandle
+                )));
+                
+                createActivity.put("to", Arrays.asList(targetActorUrl, "https://www.w3.org/ns/activitystreams#Public"));
+            } else {
+                // OHNE MENTION (rein öffentlich)
+                note.put("to", Arrays.asList("https://www.w3.org/ns/activitystreams#Public"));
+                note.put("cc", Arrays.asList("https://activitypub.alluneedspot.com/users/" + me.getUsername() + "/followers"));
+                
+                createActivity.put("to", Arrays.asList("https://www.w3.org/ns/activitystreams#Public"));
+                createActivity.put("cc", Arrays.asList("https://activitypub.alluneedspot.com/users/" + me.getUsername() + "/followers"));
+            }
+
+            deliveryService.sendToInbox(targetInbox, createActivity, actorId, privateKey);
 
             Outbox outboxItem = new Outbox();
             outboxItem.setActivity(createActivity);
@@ -144,10 +167,10 @@ public class ActivityPubController {
 
             return ResponseEntity.ok(Map.of(
                 "success", true, 
-                "message", "Public post created!",
+                "message", mentionHandle != null ? "Post with mention sent!" : "Public post created!",
                 "postContent", message,
-                "sentTo", sharedInbox,
-                "type", "public"
+                "sentTo", targetInbox,
+                "withMention", mentionHandle != null
             ));
         }
         catch (Exception e){
