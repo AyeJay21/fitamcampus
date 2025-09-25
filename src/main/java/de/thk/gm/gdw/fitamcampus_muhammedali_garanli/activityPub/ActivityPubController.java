@@ -68,13 +68,21 @@ public class ActivityPubController {
 
             String targetInbox = remoteActorService.resolveActorInbox(targetHandle);
 
+            String targetActorUrl = remoteActorService.resolveActorUrl(targetHandle);
+
             Map<String, Object> note = new HashMap<>();
             note.put("@context", "https://www.w3.org/ns/activitystreams");
             note.put("type", "Note");
             note.put("id", actorId + "/notes/" + java.util.UUID.randomUUID());
             note.put("content", message);
             note.put("attributedTo", actorId);
-            note.put("to", Arrays.asList("https://www.w3.org/ns/activitystreams#Public"));
+            note.put("to", Arrays.asList(targetActorUrl, "https://www.w3.org/ns/activitystreams#Public"));
+            note.put("cc", Arrays.asList("https://www.w3.org/ns/activitystreams#Public"));
+            note.put("tag", Arrays.asList(Map.of(
+                "type", "Mention",
+                "href", targetActorUrl,
+                "name", targetHandle
+            )));
 
             Map<String, Object> createActivity = new HashMap<>();
             createActivity.put("@context", "https://www.w3.org/ns/activitystreams");
@@ -82,7 +90,7 @@ public class ActivityPubController {
             createActivity.put("type", "Create");
             createActivity.put("actor", actorId);
             createActivity.put("object", note);
-            createActivity.put("to", Arrays.asList("https://www.w3.org/ns/activitystreams#Public"));
+            createActivity.put("to", Arrays.asList(targetActorUrl, "https://www.w3.org/ns/activitystreams#Public"));
 
             deliveryService.sendToInbox(targetInbox, createActivity, actorId, privateKey);
 
