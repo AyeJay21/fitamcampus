@@ -33,7 +33,7 @@ public class ActivityPubDeliveryService {
 
         String date = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
 
-        String signatureHeader = httpSignatureService.sign("POST", path, host, body, privateKeyPem);
+        String signatureHeader = httpSignatureService.sign("POST", path, host, body, privateKeyPem, actorId);
 
         WebClient client = WebClient.builder().baseUrl(targetInbox).build();
         client.post()

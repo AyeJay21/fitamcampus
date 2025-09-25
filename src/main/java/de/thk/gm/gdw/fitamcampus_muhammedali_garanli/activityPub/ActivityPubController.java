@@ -30,9 +30,11 @@ public class ActivityPubController {
     private OutboxRepository outboxRepository;
 
     @PostMapping("/activitypub/send-follow")
-    public ResponseEntity<?> sendFollow(@RequestParam String targetHandle) throws Exception {
+    public ResponseEntity<?> sendFollow(
+            @RequestParam String targetHandle,
+            @RequestParam String fromUser) throws Exception {
         try {
-            Actor me = actorService.getActorByUsername("ayejay");
+            Actor me = actorService.getActorByUsername(fromUser);
             String privateKey = me.getPrivateKeyPem();
             String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
 
@@ -59,10 +61,11 @@ public class ActivityPubController {
     @PostMapping("/activitypub/send-note") 
     public ResponseEntity<?> sendNote(
             @RequestParam String targetHandle, 
-            @RequestParam String message) {
+            @RequestParam String message,
+            @RequestParam(defaultValue = "ayejay") String fromUser) {
         try {
             
-            Actor me = actorService.getActorByUsername("ayejay");
+            Actor me = actorService.getActorByUsername(fromUser);
             String privateKey = me.getPrivateKeyPem();
             String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
 

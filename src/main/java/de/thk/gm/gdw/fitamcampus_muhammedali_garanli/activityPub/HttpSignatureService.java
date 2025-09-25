@@ -13,7 +13,7 @@ import java.util.Base64;
 @Service
 public class HttpSignatureService {
 
-    public String sign(String method, String path, String host, String body, String privateKeyPem) throws Exception {
+    public String sign(String method, String path, String host, String body, String privateKeyPem, String actorId) throws Exception {
 
         // Digest des Bodys
         String digest = "SHA-256=" + Base64.getEncoder().encodeToString(
@@ -45,8 +45,8 @@ public class HttpSignatureService {
         signature.update(signingString.getBytes(StandardCharsets.UTF_8));
         String sigBase64 = Base64.getEncoder().encodeToString(signature.sign());
 
-        // HTTP Signature Header zurückgeben
-        return "keyId=\"https://activitypub.alluneedspot.com/users/ayejay#main-key\","
+        // HTTP Signature Header zurückgeben (dynamische keyId!)
+        return "keyId=\"" + actorId + "#main-key\","
                 + "headers=\"(request-target) host date digest\","
                 + "signature=\"" + sigBase64 + "\"";
     }
