@@ -19,7 +19,7 @@ public class InboxController {
     @GetMapping(produces = "application/json")
     @ResponseBody
     public List<Inbox> getInbox(@PathVariable String username) {
-        return inboxRepository.findAll();
+        return inboxRepository.findByUsername(username);
     }
 
     @PostMapping(consumes = {"application/json", "application/activity+json"})
