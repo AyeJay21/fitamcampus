@@ -109,4 +109,49 @@ public class ActivityPubController {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/activitypub/create-public-post") 
+    public ResponseEntity<?> createPublicPost(@RequestParam String message) {
+        try {
+            Actor me = actorService.getActorByUsername("ayejay");
+            String privateKey = me.getPrivateKeyPem();
+            String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
+
+            Map<String, Object> note = new HashMap<>();
+            note.put("@context", "https://www.w3.org/ns/activitystreams");
+            note.put("type", "Note");
+            note.put("id", actorId + "/notes/" + java.util.UUID.randomUUID());
+            note.put("content", message);
+            note.put("attributedTo", actorId);
+            note.put("to", Arrays.asList("https://www.w3.org/ns/activitystreams#Public"));
+            note.put("cc", Arrays.asList("https://activitypub.alluneedspot.com/users/" + me.getUsername() + "/followers"));
+
+            Map<String, Object> createActivity = new HashMap<>();
+            createActivity.put("@context", "https://www.w3.org/ns/activitystreams");
+            createActivity.put("id", actorId + "/activities/create-" + java.util.UUID.randomUUID());
+            createActivity.put("type", "Create");
+            createActivity.put("actor", actorId);
+            createActivity.put("object", note);
+            createActivity.put("to", Arrays.asList("https://www.w3.org/ns/activitystreams#Public"));
+            createActivity.put("cc", Arrays.asList("https://activitypub.alluneedspot.com/users/" + me.getUsername() + "/followers"));
+
+            String sharedInbox = "https://mastodon.social/inbox";
+            deliveryService.sendToInbox(sharedInbox, createActivity, actorId, privateKey);
+
+            Outbox outboxItem = new Outbox();
+            outboxItem.setActivity(createActivity);
+            outboxRepository.save(outboxItem);
+
+            return ResponseEntity.ok(Map.of(
+                "success", true, 
+                "message", "Public post created!",
+                "postContent", message,
+                "sentTo", sharedInbox,
+                "type", "public"
+            ));
+        }
+        catch (Exception e){
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
 }

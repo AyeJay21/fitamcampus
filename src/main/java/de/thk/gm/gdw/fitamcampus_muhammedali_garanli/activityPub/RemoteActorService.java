@@ -22,7 +22,6 @@ public class RemoteActorService {
         String username = parts[0];
         String domain = parts[1];
 
-        // 1) WebFinger abrufen
         String webfingerUrl = "https://" + domain + "/.well-known/webfinger?resource=acct:" + username + "@" + domain;
         WebClient client = WebClient.create(webfingerUrl);
         String response = client.get().retrieve().bodyToMono(String.class).block();
@@ -37,7 +36,6 @@ public class RemoteActorService {
         }
         if (actorUrl == null) throw new RuntimeException("Actor URL not found for " + handle);
 
-        // 2) Actor-JSON abrufen
         String actorJson = WebClient.create(actorUrl)
                 .get()
                 .header("Accept", "application/activity+json")
@@ -47,7 +45,6 @@ public class RemoteActorService {
 
         JsonNode actorNode = mapper.readTree(actorJson);
 
-        // 3) Inbox oder SharedInbox zurückgeben
         if (actorNode.has("endpoints") && actorNode.get("endpoints").has("sharedInbox")) {
             return actorNode.get("endpoints").get("sharedInbox").asText();
         }
