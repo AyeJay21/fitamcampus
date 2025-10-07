@@ -113,7 +113,7 @@ public class ActivityPubController {
         }
     }
 
-    @PostMapping("/activitypub/send-direct-message")
+    @PostMapping("/activitypub/send-private-message")
     public ResponseEntity<?> sendDirectMessage(
             @RequestParam String targetHandle,
             @RequestParam String message,
@@ -126,15 +126,20 @@ public class ActivityPubController {
             String targetInbox = remoteActorService.resolveActorInbox(targetHandle);
             String targetActorUrl = remoteActorService.resolveActorUrl(targetHandle);
 
-            // Private Note - nur an den Empfänger, NICHT öffentlich
+            // Private Erwähnung - nur an den Empfänger, aber mit Mention-Tag
             Map<String, Object> note = new HashMap<>();
             note.put("@context", "https://www.w3.org/ns/activitystreams");
             note.put("type", "Note");
             note.put("id", actorId + "/notes/" + java.util.UUID.randomUUID());
             note.put("content", message);
             note.put("attributedTo", actorId);
-            note.put("to", Arrays.asList(targetActorUrl)); // NUR der Empfänger
-            // KEIN "cc" und KEIN "Public" - das macht es privat!
+            note.put("to", Arrays.asList(targetActorUrl)); // NUR der Empfänger - privat
+            // Erwähnung hinzufügen für bessere Sichtbarkeit
+            note.put("tag", Arrays.asList(Map.of(
+                "type", "Mention",
+                "href", targetActorUrl,
+                "name", targetHandle
+            )));
 
             Map<String, Object> createActivity = new HashMap<>();
             createActivity.put("@context", "https://www.w3.org/ns/activitystreams");
