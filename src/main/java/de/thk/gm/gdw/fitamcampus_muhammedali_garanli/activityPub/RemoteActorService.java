@@ -10,10 +10,6 @@ public class RemoteActorService {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    /**
-     * @param handle z.B. "@user@mastodon.social"
-     * @return Inbox URL des remote Actors
-     */
     public String resolveActorInbox(String handle) throws Exception {
         String normalizedHandle = handle.startsWith("@") ? handle.substring(1) : handle;
         String[] parts = normalizedHandle.split("@");

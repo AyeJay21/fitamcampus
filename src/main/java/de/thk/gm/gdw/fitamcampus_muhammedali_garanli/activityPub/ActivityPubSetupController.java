@@ -16,9 +16,6 @@ public class ActivityPubSetupController {
     @Autowired
     private ActorService actorService;
 
-    /**
-     * Erstellt einen neuen Actor mit RSA-Schlüsseln * Aufruf: POST /setup-actor?username=ayejay
-     */
     @PostMapping("/setup-actor")
     public ResponseEntity<Map<String, Object>> setupActor(@RequestParam String username) {
         Map<String, Object> result = new HashMap<>();

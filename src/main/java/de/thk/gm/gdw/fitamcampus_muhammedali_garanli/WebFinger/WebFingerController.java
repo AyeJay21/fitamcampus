@@ -27,9 +27,8 @@ public class WebFingerController {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid resource format"));
         }
 
-        // resource sieht aus wie: acct:ayejay@alluneedspot.com
-        String acct = resource.substring(5); // "ayejay@alluneedspot.com"
-        String username = acct.split("@")[0]; // "ayejay"
+        String acct = resource.substring(5);
+        String username = acct.split("@")[0];
 
         return actorRepository.findByUsername(username)
                 .map(actor -> {

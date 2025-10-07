@@ -6,16 +6,6 @@
     <link rel="stylesheet" href="/css/stylesMeetingSite.css">
 </head>
 <body>
-<div class="headerContainer">
-    <h1 class="meetingHeader">Meeting Planer</h1>
-    <nav style="margin-top: 10px;">
-        <a href="/meetings/all" style="margin-right: 15px; color: #2b90d9; text-decoration: none;">📅 Alle Meetings</a>
-        <a href="/mastodon" style="margin-right: 15px; color: #2b90d9; text-decoration: none;">🐘 Mastodon</a>
-        <a href="/activitypub" style="margin-right: 15px; color: #1a73e8; text-decoration: none;">🌐 ActivityPub</a>
-        <a href="/activitypub/post" style="margin-right: 15px; color: #1a73e8; text-decoration: none;">📝 Posten</a>
-        <a href="/activitypub/activities" style="color: #1a73e8; text-decoration: none;">📋 Activities</a>
-    </nav>
-</div>
 <div class="mainContainer">
     <form action="/meetings" method="post">
         <label for="nameId">Name:</label>

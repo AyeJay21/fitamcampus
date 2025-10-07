@@ -62,7 +62,7 @@ public class ActivityPubController {
     public ResponseEntity<?> sendNote(
             @RequestParam String targetHandle, 
             @RequestParam String message,
-            @RequestParam(defaultValue = "ayejay") String fromUser) {
+            @RequestParam String fromUser) {
         try {
             
             Actor me = actorService.getActorByUsername(fromUser);
@@ -106,6 +106,56 @@ public class ActivityPubController {
                 "message", "Note sent to " + targetHandle,
                 "noteContent", message,
                 "sentTo", targetInbox
+            ));
+        }
+        catch (Exception e){
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/activitypub/send-direct-message")
+    public ResponseEntity<?> sendDirectMessage(
+            @RequestParam String targetHandle,
+            @RequestParam String message,
+            @RequestParam String fromUser) {
+        try {
+            Actor me = actorService.getActorByUsername(fromUser);
+            String privateKey = me.getPrivateKeyPem();
+            String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
+
+            String targetInbox = remoteActorService.resolveActorInbox(targetHandle);
+            String targetActorUrl = remoteActorService.resolveActorUrl(targetHandle);
+
+            // Private Note - nur an den Empfänger, NICHT öffentlich
+            Map<String, Object> note = new HashMap<>();
+            note.put("@context", "https://www.w3.org/ns/activitystreams");
+            note.put("type", "Note");
+            note.put("id", actorId + "/notes/" + java.util.UUID.randomUUID());
+            note.put("content", message);
+            note.put("attributedTo", actorId);
+            note.put("to", Arrays.asList(targetActorUrl)); // NUR der Empfänger
+            // KEIN "cc" und KEIN "Public" - das macht es privat!
+
+            Map<String, Object> createActivity = new HashMap<>();
+            createActivity.put("@context", "https://www.w3.org/ns/activitystreams");
+            createActivity.put("id", actorId + "/activities/create-" + java.util.UUID.randomUUID());
+            createActivity.put("type", "Create");
+            createActivity.put("actor", actorId);
+            createActivity.put("object", note);
+            createActivity.put("to", Arrays.asList(targetActorUrl)); // NUR der Empfänger
+
+            deliveryService.sendToInbox(targetInbox, createActivity, actorId, privateKey);
+
+            Outbox outboxItem = new Outbox();
+            outboxItem.setActivity(createActivity);
+            outboxRepository.save(outboxItem);
+
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Direct message sent to " + targetHandle,
+                "messageContent", message,
+                "sentTo", targetInbox,
+                "visibility", "private"
             ));
         }
         catch (Exception e){
