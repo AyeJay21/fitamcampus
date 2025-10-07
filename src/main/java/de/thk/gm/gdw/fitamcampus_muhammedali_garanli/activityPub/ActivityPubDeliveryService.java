@@ -6,12 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.net.URL;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.Map;
 
 @Service
@@ -27,24 +21,35 @@ public class ActivityPubDeliveryService {
         String host = url.getHost();
         String path = url.getPath();
 
-        String digest = "SHA-256=" + Base64.getEncoder().encodeToString(
-                MessageDigest.getInstance("SHA-256").digest(body.getBytes(StandardCharsets.UTF_8))
-        );
+        // Verwende den HttpSignatureService für konsistente Header
+        HttpSignatureService.SignatureResult signatureResult = httpSignatureService.sign("POST", path, host, body, privateKeyPem, actorId);
 
-        String date = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
-
-        String signatureHeader = httpSignatureService.sign("POST", path, host, body, privateKeyPem, actorId);
+        System.out.println("Sending to: " + targetInbox);
+        System.out.println("Host: " + host);
+        System.out.println("Path: " + path);
+        System.out.println("Date: " + signatureResult.date);
+        System.out.println("Digest: " + signatureResult.digest);
+        System.out.println("Signature: " + signatureResult.signature);
 
         WebClient client = WebClient.builder().baseUrl(targetInbox).build();
-        client.post()
-                .header("Content-Type", "application/activity+json")
-                .header("Host", host)
-                .header("Date", date)
-                .header("Digest", digest)
-                .header("Signature", signatureHeader)
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        
+        try {
+            String response = client.post()
+                    .header("Content-Type", "application/activity+json")
+                    .header("Host", host)
+                    .header("Date", signatureResult.date)
+                    .header("Digest", signatureResult.digest)
+                    .header("Signature", signatureResult.signature)
+                    .header("User-Agent", "FitamCampus-ActivityPub/1.0")
+                    .bodyValue(body)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            
+            System.out.println("Response: " + response);
+        } catch (Exception e) {
+            System.err.println("Error sending to inbox: " + e.getMessage());
+            throw e;
+        }
     }
 }

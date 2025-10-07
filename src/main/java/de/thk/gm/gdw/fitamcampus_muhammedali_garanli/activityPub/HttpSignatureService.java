@@ -13,7 +13,19 @@ import java.util.Base64;
 @Service
 public class HttpSignatureService {
 
-    public String sign(String method, String path, String host, String body, String privateKeyPem, String actorId) throws Exception {
+    public static class SignatureResult {
+        public final String signature;
+        public final String date;
+        public final String digest;
+
+        public SignatureResult(String signature, String date, String digest) {
+            this.signature = signature;
+            this.date = date;
+            this.digest = digest;
+        }
+    }
+
+    public SignatureResult sign(String method, String path, String host, String body, String privateKeyPem, String actorId) throws Exception {
 
         // Digest des Bodys
         String digest = "SHA-256=" + Base64.getEncoder().encodeToString(
@@ -21,14 +33,18 @@ public class HttpSignatureService {
                         .digest(body.getBytes(StandardCharsets.UTF_8))
         );
 
-        // Aktuelles Datum RFC-1123
-        String date = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
+        // Aktuelles Datum RFC-1123 - UTC verwenden
+        String date = ZonedDateTime.now(java.time.ZoneOffset.UTC).format(DateTimeFormatter.RFC_1123_DATE_TIME);
 
-        // Hier wird der signingString korrekt erzeugt
+        // Signing String - exakte Reihenfolge ist wichtig
         String signingString = "(request-target): " + method.toLowerCase() + " " + path + "\n" +
                 "host: " + host + "\n" +
                 "date: " + date + "\n" +
                 "digest: " + digest;
+
+        // Debug-Ausgabe
+        System.out.println("Signing String:");
+        System.out.println(signingString);
 
         // Private Key laden
         String privateKeyClean = privateKeyPem
@@ -45,9 +61,12 @@ public class HttpSignatureService {
         signature.update(signingString.getBytes(StandardCharsets.UTF_8));
         String sigBase64 = Base64.getEncoder().encodeToString(signature.sign());
 
-        // HTTP Signature Header zurückgeben (dynamische keyId!)
-        return "keyId=\"" + actorId + "#main-key\","
-                + "headers=\"(request-target) host date digest\","
-                + "signature=\"" + sigBase64 + "\"";
+        // HTTP Signature Header erstellen
+        String signatureHeader = "keyId=\"" + actorId + "#main-key\"," +
+                "algorithm=\"rsa-sha256\"," +
+                "headers=\"(request-target) host date digest\"," +
+                "signature=\"" + sigBase64 + "\"";
+
+        return new SignatureResult(signatureHeader, date, digest);
     }
 }
