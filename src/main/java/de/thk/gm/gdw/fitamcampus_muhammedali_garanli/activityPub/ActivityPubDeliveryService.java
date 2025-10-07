@@ -21,20 +21,38 @@ public class ActivityPubDeliveryService {
         String host = url.getHost();
         String path = url.getPath();
 
+        // Sicherstellen, dass path nicht leer ist
+        if (path == null || path.isEmpty()) {
+            path = "/";
+        }
+
         // Verwende den HttpSignatureService für konsistente Header
         HttpSignatureService.SignatureResult signatureResult = httpSignatureService.sign("POST", path, host, body, privateKeyPem, actorId);
 
-        System.out.println("Sending to: " + targetInbox);
-        System.out.println("Host: " + host);
-        System.out.println("Path: " + path);
+        System.out.println("=================== ACTIVITYPUB DEBUG ===================");
+        System.out.println("Target URL: " + targetInbox);
+        System.out.println("Host: '" + host + "'");
+        System.out.println("Path: '" + path + "'");
         System.out.println("Date: " + signatureResult.date);
         System.out.println("Digest: " + signatureResult.digest);
         System.out.println("Signature: " + signatureResult.signature);
+        System.out.println("Actor ID: " + actorId);
+        System.out.println("Body Length: " + body.length() + " characters");
+        System.out.println("Body Preview: " + body.substring(0, Math.min(200, body.length())) + "...");
+        System.out.println("========================================================");
 
-        WebClient client = WebClient.builder().baseUrl(targetInbox).build();
+        // WebClient richtig konfigurieren - nur Schema+Host als baseUrl
+        String baseUrl = url.getProtocol() + "://" + host;
+        if (url.getPort() != -1) {
+            baseUrl += ":" + url.getPort();
+        }
+        
+        WebClient clientFixed = WebClient.builder().baseUrl(baseUrl).build();
         
         try {
-            String response = client.post()
+            System.out.println("Sending HTTP POST to: " + baseUrl + path);
+            String response = clientFixed.post()
+                    .uri(path)  // Path separat angeben!
                     .header("Content-Type", "application/activity+json")
                     .header("Host", host)
                     .header("Date", signatureResult.date)
@@ -46,9 +64,16 @@ public class ActivityPubDeliveryService {
                     .bodyToMono(String.class)
                     .block();
             
-            System.out.println("Response: " + response);
+            System.out.println("SUCCESS! Response from " + host + ": " + response);
         } catch (Exception e) {
-            System.err.println("Error sending to inbox: " + e.getMessage());
+            System.err.println("=================== ERROR ===================");
+            System.err.println("Failed to send to: " + targetInbox);
+            System.err.println("Error message: " + e.getMessage());
+            System.err.println("Error type: " + e.getClass().getSimpleName());
+            if (e.getCause() != null) {
+                System.err.println("Root cause: " + e.getCause().getMessage());
+            }
+            System.err.println("=============================================");
             throw e;
         }
     }
