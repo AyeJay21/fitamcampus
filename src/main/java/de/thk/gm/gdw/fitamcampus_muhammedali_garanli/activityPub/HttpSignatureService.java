@@ -33,8 +33,9 @@ public class HttpSignatureService {
                         .digest(body.getBytes(StandardCharsets.UTF_8))
         );
 
-        // Aktuelles Datum RFC-1123 - UTC verwenden
-        String date = ZonedDateTime.now(java.time.ZoneOffset.UTC).format(DateTimeFormatter.RFC_1123_DATE_TIME);
+        // Aktuelles Datum RFC-1123 - UTC verwenden mit korrektem Format
+        String date = ZonedDateTime.now(java.time.ZoneOffset.UTC)
+            .format(DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'", java.util.Locale.ENGLISH));
 
         // Signing String - exakte Reihenfolge ist wichtig
         String signingString = "(request-target): " + method.toLowerCase() + " " + path + "\n" +
@@ -61,11 +62,11 @@ public class HttpSignatureService {
         signature.update(signingString.getBytes(StandardCharsets.UTF_8));
         String sigBase64 = Base64.getEncoder().encodeToString(signature.sign());
 
-        // HTTP Signature Header erstellen
-        String signatureHeader = "keyId=\"" + actorId + "#main-key\"," +
-                "algorithm=\"rsa-sha256\"," +
-                "headers=\"(request-target) host date digest\"," +
-                "signature=\"" + sigBase64 + "\"";
+        // HTTP Signature Header erstellen - exakt wie Mastodon es erwartet
+        String signatureHeader = String.format(
+            "keyId=\"%s#main-key\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest\",signature=\"%s\"",
+            actorId, sigBase64
+        );
 
         return new SignatureResult(signatureHeader, date, digest);
     }
