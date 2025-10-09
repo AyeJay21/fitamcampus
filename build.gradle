@@ -25,6 +25,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.1'
     implementation 'jakarta.validation:jakarta.validation-api:3.0.0'
     implementation 'org.hibernate.validator:hibernate-validator:7.0.1.Final'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     runtimeOnly 'org.postgresql:postgresql:42.6.0'
     // https://mvnrepository.com/artifact/de.westnordost/osmapi
     implementation 'de.westnordost:osmapi:5.1'
@@ -53,4 +54,18 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// Hot Reload Task
+task copyResources(type: Copy) {
+    from 'src/main/resources'
+    into 'build/resources/main'
+    doLast {
+        println "Resources copied for hot reload!"
+    }
+}
+
+// Automatisches Kopieren beim Build
+processResources {
+    dependsOn copyResources
 }

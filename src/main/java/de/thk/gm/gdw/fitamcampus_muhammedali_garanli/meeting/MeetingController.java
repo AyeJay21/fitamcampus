@@ -1,5 +1,6 @@
 package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.meeting;
 
+import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.auth.LoginController;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.commentary.Comment;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.commentary.CommentService;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.weather.Weather;
@@ -11,9 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.util.List;
+import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
 
 @Controller
@@ -39,8 +39,14 @@ public class MeetingController {
     }
 
     @GetMapping
-    public String getAll(Model model) {
+    public String getAll(Model model, HttpSession session) {
+        // Login-Check
+        if (!LoginController.isLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        
         model.addAttribute("meetings", meetingService.getAllMeetings());
+        model.addAttribute("currentUser", LoginController.getCurrentUser(session));
         return "allMeetings";
     }
 

@@ -4,23 +4,30 @@ import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.Actor;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.ActorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
+@Controller
 public class ActivityPubSetupController {
     @Autowired
     private ActorService actorService;
 
-    @PostMapping("/setup-actor")
-    public ResponseEntity<Map<String, Object>> setupActor(@RequestParam String username) {
+    @PostMapping(value = "/setup-actor", consumes = "application/json")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> setupActorJson(@RequestParam("username") String username,
+                                                              @RequestParam("email") String email,
+                                                              @RequestParam("password") String password) {
+//        String username = request.get("username");
+//        String email = request.get("email");
+//        String password = request.get("password");
+
         Map<String, Object> result = new HashMap<>();
         try {
-            Actor actor = actorService.createActor(username);
+            Actor actor = actorService.createActor(username, email, password);
             result.put("success", true);
             result.put("message", "Actor erfolgreich erstellt");
             result.put("username", actor.getUsername());
@@ -34,5 +41,17 @@ public class ActivityPubSetupController {
             return ResponseEntity.status(500).body(result);
         }
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping(value = "/setup-actor", consumes = "application/x-www-form-urlencoded")
+    public String setupActorForm(@RequestParam("username") String username,
+                                @RequestParam("email") String email,
+                                @RequestParam("password") String password) {
+        try {
+            actorService.createActor(username, email, password);
+            return "redirect:/meetingSite";
+        } catch (Exception e) {
+            return "redirect:/register?error=" + e.getMessage();
+        }
     }
 }

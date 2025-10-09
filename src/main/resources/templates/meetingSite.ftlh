@@ -6,6 +6,13 @@
     <link rel="stylesheet" href="/css/stylesMeetingSite.css">
 </head>
 <body>
+<div class="user-info">
+    <#if currentUser??>
+        <span>Willkommen, ${currentUser.username}!</span>
+        <a href="/logout">Logout</a>
+        <a href="/meetings">Alle Meetings</a>
+    </#if>
+</div>
 <div class="mainContainer">
     <form action="/meetings" method="post">
         <label for="nameId">Name:</label>

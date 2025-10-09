@@ -10,7 +10,10 @@ public class Actor {
 
     @Column(unique = true, nullable = false)
     private String username;
-
+    @Column(unique = true, nullable = false)
+    private String email;
+    @Column( nullable = false)
+    private String passwordHashed;
     private String displayName;
 
     @Lob
@@ -94,5 +97,21 @@ public class Actor {
 
     public void setPrivateKeyPem(String privateKeyPem) {
         this.privateKeyPem = privateKeyPem;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPasswordHashed() {
+        return passwordHashed;
+    }
+
+    public void setPasswordHashed(String passwordHashed) {
+        this.passwordHashed = passwordHashed;
     }
 }
