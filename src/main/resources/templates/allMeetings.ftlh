@@ -398,12 +398,13 @@
                 meetingIds.push(box.value)
             });
 
+            console.log("Message:" +document.querySelector('[name="message"]').value + "TargetHandle: "+ document.querySelector('[name="targetHandle"]').value + "FromUser: " + "${currentUser.username}");
             const requestData = {
                 message: document.querySelector('[name="message"]').value,
                 targetHandle: document.querySelector('[name="targetHandle"]').value,
                 fromUser: "${currentUser.username}",
-                instanceType: document.querySelector('[name="instanceType"]').value,
-                meetingIds: meetingIds
+                // instanceType: document.querySelector('[name="instanceType"]').value,
+                // meetingIds: meetingIds
             };
             console.log("Sending data" + requestData);
             fetch("/activitypub/send-note", {
