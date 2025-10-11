@@ -6,6 +6,19 @@
     <link rel="stylesheet" href="/css/overviewMeetingStyles.css">
 </head>
 <body>
+<nav style="padding: 15px 20px; background: white; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;">
+    <a href="/meetingSite" style="color: #3498db; text-decoration: none; margin: 0 15px; font-weight: 500; transition: color 0.3s;">← Zurück zum Hauptmenü</a> |
+    <a href="/meetings" style="color: #3498db; text-decoration: none; margin: 0 15px; font-weight: 500; transition: color 0.3s;">Alle Meetings</a> |
+    <a href="/logout" style="color: #e74c3c; text-decoration: none; margin: 0 15px; font-weight: 500; transition: color 0.3s;">Logout</a>
+</nav>
+<style>
+nav a:hover {
+    color: #2980b9 !important;
+}
+nav a[href="/logout"]:hover {
+    color: #c0392b !important;
+}
+</style>
 <div class="headerContainer">
     <h1>Meeting Overview</h1>
 </div>
@@ -47,11 +60,6 @@
     <form action="/meetings/${meeting.id}" method="post">
         <input type="hidden" name="_method" value="delete">
         <button id="deleteId" name="delete" type="submit">Löschen</button>
-    </form>
-    
-    <form action="/mastodon/post" method="post" style="margin-top: 10px;">
-        <input type="hidden" name="content" value="🏃‍♂️ Neues Meeting: ${meeting.name} am ${meeting.date} um ${meeting.time} in ${meeting.ort}! Sportart: ${meeting.sportArt} #FitamCampus #Sport">
-        <button type="submit" style="background-color: #2b90d9; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">📤 Auf Mastodon teilen</button>
     </form>
 </div>
 

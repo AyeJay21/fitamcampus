@@ -21,9 +21,6 @@ public class ActivityPubSetupController {
     public ResponseEntity<Map<String, Object>> setupActorJson(@RequestParam("username") String username,
                                                               @RequestParam("email") String email,
                                                               @RequestParam("password") String password) {
-//        String username = request.get("username");
-//        String email = request.get("email");
-//        String password = request.get("password");
 
         Map<String, Object> result = new HashMap<>();
         try {
@@ -49,7 +46,7 @@ public class ActivityPubSetupController {
                                 @RequestParam("password") String password) {
         try {
             actorService.createActor(username, email, password);
-            return "redirect:/meetingSite";
+            return "redirect:/";
         } catch (Exception e) {
             return "redirect:/register?error=" + e.getMessage();
         }

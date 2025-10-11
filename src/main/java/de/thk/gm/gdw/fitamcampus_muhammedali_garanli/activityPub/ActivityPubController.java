@@ -7,12 +7,10 @@ import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.outbox.OutboxRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class ActivityPubController {
@@ -31,8 +29,8 @@ public class ActivityPubController {
 
     @PostMapping("/activitypub/send-follow")
     public ResponseEntity<?> sendFollow(
-            @RequestParam String targetHandle,
-            @RequestParam String fromUser) throws Exception {
+            @RequestBody String targetHandle,
+            @RequestBody String fromUser) throws Exception {
         try {
             Actor me = actorService.getActorByUsername(fromUser);
             String privateKey = me.getPrivateKeyPem();
@@ -60,10 +58,12 @@ public class ActivityPubController {
 
     @PostMapping("/activitypub/send-note") 
     public ResponseEntity<?> sendNote(
-            @RequestParam String targetHandle, 
-            @RequestParam String message,
-            @RequestParam String fromUser) {
+            @RequestBody SendNoteRequest request) {
         try {
+            String fromUser = request.getFromUser();
+            String message = request.getMessage();
+            String targetHandle = request.getTargetHandle();
+            List<UUID> meetingIds = request.getMeetingIds();
             
             Actor me = actorService.getActorByUsername(fromUser);
             String privateKey = me.getPrivateKeyPem();
@@ -115,9 +115,9 @@ public class ActivityPubController {
 
     @PostMapping("/activitypub/send-private-message")
     public ResponseEntity<?> sendDirectMessage(
-            @RequestParam String targetHandle,
-            @RequestParam String message,
-            @RequestParam String fromUser) {
+            @RequestBody String targetHandle,
+            @RequestBody String message,
+            @RequestBody String fromUser) {
         try {
             Actor me = actorService.getActorByUsername(fromUser);
             String privateKey = me.getPrivateKeyPem();
@@ -147,7 +147,7 @@ public class ActivityPubController {
             createActivity.put("type", "Create");
             createActivity.put("actor", actorId);
             createActivity.put("object", note);
-            createActivity.put("to", Arrays.asList(targetActorUrl)); // NUR der Empfänger
+            createActivity.put("to", Arrays.asList(targetActorUrl));
 
             deliveryService.sendToInbox(targetInbox, createActivity, actorId, privateKey);
 

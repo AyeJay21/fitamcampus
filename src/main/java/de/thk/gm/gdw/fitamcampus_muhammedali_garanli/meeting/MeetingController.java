@@ -1,6 +1,6 @@
 package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.meeting;
 
-import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.auth.LoginController;
+import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.navigation.LoginController;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.commentary.Comment;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.commentary.CommentService;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.weather.Weather;

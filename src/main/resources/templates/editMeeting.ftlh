@@ -6,6 +6,12 @@
     <link rel="stylesheet" href="/css/editMeetingStyles.css">
 </head>
 <body>
+<nav style="padding: 1rem; background: #f8f9fa; margin-bottom: 2rem;">
+    <a href="/meetingSite">← Zurück zum Hauptmenü</a> | 
+    <a href="/meetings">Alle Meetings</a> |
+    <a href="/meetings/${meeting.id}">Meeting Ansicht</a> |
+    <a href="/logout">Logout</a>
+</nav>
 <div class="headerContainer">
     <h1>Meeting</h1>
     <h2>Neuer Plan</h2>

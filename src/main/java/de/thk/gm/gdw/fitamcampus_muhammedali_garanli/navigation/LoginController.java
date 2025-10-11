@@ -1,6 +1,7 @@
-package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.auth;
+package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.navigation;
 
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.Actor;
+import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.ActorRepository;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.ActorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,9 @@ public class LoginController {
     
     @Autowired
     private ActorService actorService;
+
+    @Autowired
+    public ActorRepository actorRepository;
     
     // GET für Login-Seite
     @GetMapping("/login")
@@ -28,8 +32,7 @@ public class LoginController {
         }
         return "login";
     }
-    
-    // POST für Login-Verarbeitung
+
     @PostMapping("/login")
     public String processLogin(@RequestParam("email") String email, 
                              @RequestParam("password") String password,
@@ -43,7 +46,7 @@ public class LoginController {
             session.setAttribute("userId", actor.getId());
             session.setAttribute("username", actor.getUsername());
             
-            return "redirect:/meetingSite";
+            return "redirect:/";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             return "login";
