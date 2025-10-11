@@ -393,18 +393,22 @@
         document.getElementById('activityPubForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            const meetingIds = [];
+            const selectedMeetings = [];
             document.querySelectorAll('input[name="meetingIds"]:checked').forEach(box => {
-                meetingIds.push(box.value)
-            });
+                const label = box.parentElement;
 
+                selectedMeetings.push(label.textContent.trim());
+            })
+
+            let message = document.querySelector('[name="message"]').value;
+            if (selectedMeetings.length > 0) {
+                message += "\n\nAusgewählte Meetings:\n" + selectedMeetings.map(m => "- " + m).join("\n");
+            }
             console.log("Message:" +document.querySelector('[name="message"]').value + "TargetHandle: "+ document.querySelector('[name="targetHandle"]').value + "FromUser: " + "${currentUser.username}");
             const requestData = {
-                message: document.querySelector('[name="message"]').value,
+                message: message,
                 targetHandle: document.querySelector('[name="targetHandle"]').value,
                 fromUser: "${currentUser.username}",
-                // instanceType: document.querySelector('[name="instanceType"]').value,
-                // meetingIds: meetingIds
             };
             console.log("Sending data" + requestData);
             fetch("/activitypub/send-note", {
