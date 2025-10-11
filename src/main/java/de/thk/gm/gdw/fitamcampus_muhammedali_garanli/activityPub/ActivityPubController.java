@@ -29,9 +29,11 @@ public class ActivityPubController {
 
     @PostMapping("/activitypub/send-follow")
     public ResponseEntity<?> sendFollow(
-            @RequestBody String targetHandle,
-            @RequestBody String fromUser) throws Exception {
+            @RequestBody SendFollowRequest request) throws Exception {
         try {
+            String fromUser = request.getFromUser();
+            String targetHandle = request.getTargetHandle();
+            
             Actor me = actorService.getActorByUsername(fromUser);
             String privateKey = me.getPrivateKeyPem();
             String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
