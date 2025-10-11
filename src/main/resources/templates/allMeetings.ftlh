@@ -332,7 +332,7 @@
 
     <style>
         .meetings-selection {
-            max-height: 200px;
+            max-height: 201px;
             overflow-y: auto;
             border: 2px solid #ecf0f1;
             border-radius: 6px;
