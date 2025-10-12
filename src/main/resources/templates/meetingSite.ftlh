@@ -6,13 +6,63 @@
     <link rel="stylesheet" href="/css/stylesMeetingSite.css">
 </head>
 <body>
-<div class="user-info">
-    <#if currentUser??>
-        <span>Willkommen, ${currentUser.username}!</span>
-        <a href="/logout">Logout</a>
-        <a href="/meetings">Alle Meetings</a>
-    </#if>
-</div>
+<nav class="navbar">
+    <div class="navbar-left">
+        <a href="/meetings" class="nav-link">🏠 Alle Meetings</a>
+        <a href="/meetingSite" class="nav-link">➕ Neues Meeting</a>
+    </div>
+    <div class="navbar-right">
+        <#if currentUser??>
+            <span class="nav-user">👤 ${currentUser.username}</span>
+            <a href="/logout" class="nav-link logout">Logout</a>
+        </#if>
+    </div>
+</nav>
+<style>
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        padding: 18px 32px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+        border-radius: 10px;
+        margin: 24px auto 32px auto;
+        max-width: 900px;
+    }
+    .navbar-left, .navbar-right {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+    .nav-link {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 1.08rem;
+        padding: 6px 14px;
+        border-radius: 6px;
+        transition: background 0.2s, color 0.2s;
+    }
+    .nav-link:hover {
+        background: #f0f4fa;
+        color: #217dbb;
+    }
+    .nav-link.logout {
+        color: #e74c3c;
+        background: #fbeeea;
+    }
+    .nav-link.logout:hover {
+        background: #f8d7da;
+        color: #c0392b;
+    }
+    .nav-user {
+        font-size: 1.08rem;
+        color: #2c3e50;
+        font-weight: 500;
+        margin-right: 8px;
+    }
+</style>
 <div class="mainContainer">
     <form action="/meetings" method="post">
         <label for="nameId">Name:</label>

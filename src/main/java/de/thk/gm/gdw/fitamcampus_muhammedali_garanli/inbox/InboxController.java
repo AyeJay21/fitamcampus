@@ -31,6 +31,12 @@ public class InboxController {
         inbox.setType((String) activity.get("type"));
         inbox.setActor((String) activity.get("actor"));
         inbox.setObjectData(activity.get("object").toString());
+        if ("Create".equals(activity.get("type")) && activity.get("object") instanceof Map) {
+            Map<String, Object> note = (Map<String, Object>) activity.get("object");
+            String content = (String) note.get("content");
+            String inReplyTo = (String) note.get("inReplyTo");
+            String noteActor = (String) note.get("attributedTo");
+        }
 
         Inbox saved = inboxRepository.save(inbox);
         
