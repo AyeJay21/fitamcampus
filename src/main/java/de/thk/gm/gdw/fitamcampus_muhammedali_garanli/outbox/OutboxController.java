@@ -25,7 +25,7 @@ public class OutboxController {
 
     @GetMapping(value = "/users/{username}/outbox", produces = "application/activity+json")
     public ResponseEntity<?> getOutbox(@PathVariable String username) throws IOException {
-        List<Outbox> items = outboxRepository.findByUsername(username);
+        List<Outbox> items = outboxRepository.findAll();
 
         List<Map<String,Object>> orderedItems = new ArrayList<>();
         ObjectMapper mapper = new ObjectMapper();
