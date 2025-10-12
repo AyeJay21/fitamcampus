@@ -4,8 +4,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -41,5 +43,19 @@ public class ActorController {
                         }
                 )
                 .orElseGet(() -> ResponseEntity.status(404).body(Map.of("error", "Actor not found")));
+    }
+
+    @GetMapping(value = "/users/{username}/followers", produces = "application/activity+json")
+    public ResponseEntity<?> getFollowers(@PathVariable String username) {
+        List<String> followers = List.of(
+                "https://mastodon.social/users/AyeJay21"
+        );
+        Map<String, Object> response = new HashMap<>();
+        response.put("@context", "https://www.w3.org/ns/activitystreams");
+        response.put("id", "https://activitypub.alluneedspot.com/users/" + username + "/followers");
+        response.put("type", "OrderedCollection");
+        response.put("totalItems", followers.size());
+        response.put("orderedItems", followers);
+        return ResponseEntity.ok(response);
     }
 }
