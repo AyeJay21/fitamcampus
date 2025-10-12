@@ -117,10 +117,11 @@ public class ActivityPubController {
 
     @PostMapping("/activitypub/send-private-message")
     public ResponseEntity<?> sendDirectMessage(
-            @RequestBody String targetHandle,
-            @RequestBody String message,
-            @RequestBody String fromUser) {
+            @RequestBody SendNoteRequest request) {
         try {
+            String fromUser = request.getFromUser();
+            String message = request.getMessage();
+            String targetHandle = request.getTargetHandle();
             Actor me = actorService.getActorByUsername(fromUser);
             String privateKey = me.getPrivateKeyPem();
             String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
