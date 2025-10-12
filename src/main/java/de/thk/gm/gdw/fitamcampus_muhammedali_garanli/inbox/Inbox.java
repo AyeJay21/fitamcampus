@@ -28,7 +28,7 @@ public class Inbox {
     private String inReplyTo;
     private String objectId;
     private String attributedTo;
-    private String to;
+    private String toField;
 
     @JsonIgnore
     public void setActivity(Map<String, Object> activity) throws IOException {
@@ -46,11 +46,10 @@ public class Inbox {
                 if (objectMap.get("id") != null) this.objectId = objectMap.get("id").toString();
                 if (objectMap.get("type") != null) this.objectType = objectMap.get("type").toString();
                 if (objectMap.get("published") != null) this.objectType = objectMap.get("published").toString();
-                if (objectMap.get("published") != null) this.objectType = objectMap.get("published").toString();
-                if (objectMap.get("attributedTo") != null) this.inReplyTo = objectMap.get("attributedTo").toString();
+                if (objectMap.get("published") != null) this.published = objectMap.get("published").toString();
+                if (objectMap.get("attributedTo") != null) this.attributedTo = objectMap.get("attributedTo").toString();
                 if (objectMap.get("content") != null) this.content = objectMap.get("content").toString();
-                if (objectMap.get("to") != null) this.content = objectMap.get("to").toString();
-
+                if (objectMap.get("to") != null) this.toField = objectMap.get("to").toString();
             }
         }
     }
@@ -134,11 +133,11 @@ public class Inbox {
         this.attributedTo = attributedTo;
     }
 
-    public String getTo() {
-        return to;
+    public String getToField() {
+        return toField;
     }
 
-    public void setTo(String to) {
-        this.to = to;
+    public void setTo(String toField) {
+        this.toField = toField;
     }
 }
