@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users/{username}/followers")
@@ -75,16 +76,17 @@ public class FollowerController {
             // Accept-Aktivität bauen
             java.util.Map<String, Object> accept = new java.util.HashMap<>();
             accept.put("@context", "https://www.w3.org/ns/activitystreams");
-            accept.put("id", actorId + "/activities/accept-" + java.util.UUID.randomUUID());
+            accept.put("id", actorId + "/activities/accept-" + UUID.randomUUID());
             accept.put("type", "Accept");
             accept.put("actor", actorId);
             // Das Objekt ist die ursprüngliche Follow-Aktivität
             java.util.Map<String, Object> followObj = new java.util.HashMap<>();
-//            followObj.put("type", "Follow");
-//            followObj.put("actor", targetActorUrl);
-//            followObj.put("object", actorId);
-            accept.put("object", followActivityId);
-
+            followObj.put("@context", "https://www.w3.org/ns/activitystreams");
+            //followObj.put("id", );
+            followObj.put("type", "Follow");
+            followObj.put("actor", targetActorUrl);
+            followObj.put("object", actorId);
+            accept.put("object", followObj);
 
             // Senden
             deliveryService.sendToInbox(targetInbox, accept, actorId, privateKey);
