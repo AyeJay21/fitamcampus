@@ -20,32 +20,14 @@ public class Inbox {
     private String username;
     private String type;
     private String actor;
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String objectData;
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String activityId;
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String published;
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String objectType;
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String content;
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String inReplyTo;
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String objectId;
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String attributedTo;
-    @Lob
-    @Column(columnDefinition = "TEXT")
     private String toField;
 
     @JsonIgnore
