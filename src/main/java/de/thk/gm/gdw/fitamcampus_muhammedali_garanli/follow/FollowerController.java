@@ -43,9 +43,30 @@ public class FollowerController {
             String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
             String privateKey = me.getPrivateKeyPem();
 
-            // Remote Inbox und Actor URL auflösen
-            String targetInbox = remoteActorService.resolveActorInbox(followerUrl);
-            String targetActorUrl = remoteActorService.resolveActorUrl(followerUrl);
+            String targetInbox;
+            String targetActorUrl;
+            if (followerUrl.startsWith("http://") || followerUrl.startsWith("https://")) {
+                // FollowerUrl ist eine vollständige URL, hole Actor JSON direkt
+                org.springframework.web.reactive.function.client.WebClient client = org.springframework.web.reactive.function.client.WebClient.create(followerUrl);
+                String actorJson = client.get()
+                        .header("Accept", "application/activity+json")
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .block();
+                com.fasterxml.jackson.databind.JsonNode actorNode = new com.fasterxml.jackson.databind.ObjectMapper().readTree(actorJson);
+                if (actorNode.has("endpoints") && actorNode.get("endpoints").has("sharedInbox")) {
+                    targetInbox = actorNode.get("endpoints").get("sharedInbox").asText();
+                } else if (actorNode.has("inbox")) {
+                    targetInbox = actorNode.get("inbox").asText();
+                } else {
+                    throw new RuntimeException("No inbox found for actor: " + followerUrl);
+                }
+                targetActorUrl = followerUrl;
+            } else {
+                // Handle wie bisher
+                targetInbox = remoteActorService.resolveActorInbox(followerUrl);
+                targetActorUrl = remoteActorService.resolveActorUrl(followerUrl);
+            }
 
             // Accept-Aktivität bauen
             java.util.Map<String, Object> accept = new java.util.HashMap<>();
