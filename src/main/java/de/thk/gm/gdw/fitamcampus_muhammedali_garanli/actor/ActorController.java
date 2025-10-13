@@ -48,7 +48,8 @@ public class ActorController {
     @GetMapping(value = "/users/{username}/followers", produces = "application/activity+json")
     public ResponseEntity<?> getFollowers(@PathVariable String username) {
         List<String> followers = List.of(
-                "https://mastodon.social/users/AyeJay21"
+                "https://mastodon.social/users/AyeJay21",
+                "https://pixelfed.de/users/AyeJay21"
         );
         Map<String, Object> response = new HashMap<>();
         response.put("@context", "https://www.w3.org/ns/activitystreams");

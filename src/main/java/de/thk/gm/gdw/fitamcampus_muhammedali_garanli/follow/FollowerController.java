@@ -1,11 +1,14 @@
 package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.follow;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.activityPub.ActivityPubDeliveryService;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.activityPub.RemoteActorService;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.ActorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Map;
@@ -47,13 +50,13 @@ public class FollowerController {
             String targetActorUrl;
             if (followerUrl.startsWith("http://") || followerUrl.startsWith("https://")) {
                 // FollowerUrl ist eine vollständige URL, hole Actor JSON direkt
-                org.springframework.web.reactive.function.client.WebClient client = org.springframework.web.reactive.function.client.WebClient.create(followerUrl);
+                WebClient client = WebClient.create(followerUrl);
                 String actorJson = client.get()
                         .header("Accept", "application/activity+json")
                         .retrieve()
                         .bodyToMono(String.class)
                         .block();
-                com.fasterxml.jackson.databind.JsonNode actorNode = new com.fasterxml.jackson.databind.ObjectMapper().readTree(actorJson);
+                JsonNode actorNode = new ObjectMapper().readTree(actorJson);
                 if (actorNode.has("endpoints") && actorNode.get("endpoints").has("sharedInbox")) {
                     targetInbox = actorNode.get("endpoints").get("sharedInbox").asText();
                 } else if (actorNode.has("inbox")) {
