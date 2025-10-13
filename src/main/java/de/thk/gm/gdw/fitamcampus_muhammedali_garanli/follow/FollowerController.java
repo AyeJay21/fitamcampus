@@ -32,6 +32,7 @@ public class FollowerController {
     @PostMapping("/accept")
     public ResponseEntity<?> acceptFollower(@PathVariable String username, @RequestBody Map<String, String> body) {
         String followerUrl = body.get("followerUrl");
+        String followActivityId = body.get("followActivityId");
         if (followerUrl == null || followerUrl.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "followerUrl required"));
         }
@@ -79,10 +80,11 @@ public class FollowerController {
             accept.put("actor", actorId);
             // Das Objekt ist die ursprüngliche Follow-Aktivität
             java.util.Map<String, Object> followObj = new java.util.HashMap<>();
-            followObj.put("type", "Follow");
-            followObj.put("actor", targetActorUrl);
-            followObj.put("object", actorId);
-            accept.put("object", followObj);
+//            followObj.put("type", "Follow");
+//            followObj.put("actor", targetActorUrl);
+//            followObj.put("object", actorId);
+            accept.put("object", followActivityId);
+
 
             // Senden
             deliveryService.sendToInbox(targetInbox, accept, actorId, privateKey);
