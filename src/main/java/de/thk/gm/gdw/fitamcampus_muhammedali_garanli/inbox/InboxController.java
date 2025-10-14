@@ -25,6 +25,7 @@ public class InboxController {
     @PostMapping(consumes = {"application/json", "application/activity+json"})
     @ResponseBody
     public Map<String, Object> addToInbox(@PathVariable String username, @RequestBody Map<String, Object> activity) throws Exception {
+        System.out.println("Empfangene Activity: " + activity);
         Inbox inbox = new Inbox();
         inbox.setActivity(activity);
         inbox.setUsername(username);

@@ -14,14 +14,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpSession;
-import java.util.UUID;
+
+import java.util.*;
 
 @Controller
 @RequestMapping("/meetings")
 public class MeetingController {
 
-    private final MeetingService meetingService;
-    private final CommentService commentService;
+    public final MeetingService meetingService;
+    public final CommentService commentService;
     public final WeatherService weatherService;
 
     @Autowired
@@ -42,13 +43,23 @@ public class MeetingController {
     }
 
     @GetMapping
-    public String getAll(Model model, HttpSession session) {
-        // Login-Check
+    public String getAll(Model model, HttpSession session) throws Exception {
         if (!LoginController.isLoggedIn(session)) {
             return "redirect:/login";
         }
         String username = LoginController.getCurrentUser(session).getUsername();
-        model.addAttribute("meetings", meetingService.getAllMeetingsForUser(username));
+        Iterable<Meeting> meetings = meetingService.getAllMeetingsForUser(username);
+        Map<String, Weather> weathers = new HashMap<>();
+        if (meetings == null) {
+            throw new Exception("Meeting ist leer");
+        }
+        for(Meeting meeting: meetings){
+            Weather weather = weatherService.getWeather(meeting.date, meeting.getOrt(),meeting.time);
+            weathers.put(meeting.getId().toString(), weather);
+            System.out.println("WeatherMeetingId: " + meeting.getId() + "Weather: " + weather.getTemperature());
+        }
+        model.addAttribute("weathers", weathers);
+        model.addAttribute("meetings", meetings);
         model.addAttribute("currentUser", LoginController.getCurrentUser(session));
         return "allMeetings";
     }

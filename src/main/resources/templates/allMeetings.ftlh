@@ -261,23 +261,34 @@
                             <div class="detail-label">Uhrzeit</div>
                             <div class="detail-value">${meeting.time}</div>
                         </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Sportart</div>
-                            <div class="detail-value">${meeting.sportArt}</div>
+                            <#if weathers[meeting.id]??>
+                                <#assign weather = weathers[meeting.id]>
+                                <div class="detail-item">
+                                    <div class="detail-label">Debug Wetter-Key</div>
+                                    <div class="detail-value">${meeting.id}</div>
+                                </div>
+                            </#if>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Indoor/Outdoor</div>
-                            <div class="detail-value">${meeting.inOrOut}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Beschreibung</div>
+                            <div class="detail-label">Beschreibungs</div>
                             <div class="detail-value">${meeting.description}</div>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">MeetingID</div>
                             <div class="detail-value">${meeting.id}</div>
                         </div>
-                    </div>
+                        <#if weathers[meeting.id]??>
+                        <#assign weather = weathers[meeting.id]>
+                        <#if weather??>
+                        <div class="detail-item">
+                            <div class="detail-label">Wetter</div>
+                            <div class="detail-value">
+                                Temperatur: ${weather.temperature}°C<br>
+                                Typ: ${weather.weatherType}
+                            </div>
+                        </div>
+                        </#if>
+                        </#if>
                 </div>
             </#list>
         <#else>
