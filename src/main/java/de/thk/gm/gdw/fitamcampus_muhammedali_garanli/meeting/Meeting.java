@@ -23,6 +23,7 @@ public class Meeting {
     public String sportArt;
     public String inOrOut;
     public String description;
+    public String createdBy; // Username des Erstellers
 
     public Meeting() {
     }

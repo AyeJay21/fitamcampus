@@ -33,7 +33,10 @@ public class MeetingController {
 
     @ResponseStatus(HttpStatus.FOUND)
     @PostMapping
-    public String addMeeting(Meeting meeting, Model model) {
+    public String addMeeting(Meeting meeting, Model model, HttpSession session) {
+        // Setze den Ersteller
+        String username = LoginController.getCurrentUser(session).getUsername();
+        meeting.setCreatedBy(username);
         model.addAttribute("meeting", meetingService.createMeeting(meeting));
         return "redirect:/meetings/" + meeting.getId();
     }
@@ -44,8 +47,8 @@ public class MeetingController {
         if (!LoginController.isLoggedIn(session)) {
             return "redirect:/login";
         }
-        
-        model.addAttribute("meetings", meetingService.getAllMeetings());
+        String username = LoginController.getCurrentUser(session).getUsername();
+        model.addAttribute("meetings", meetingService.getAllMeetingsForUser(username));
         model.addAttribute("currentUser", LoginController.getCurrentUser(session));
         return "allMeetings";
     }

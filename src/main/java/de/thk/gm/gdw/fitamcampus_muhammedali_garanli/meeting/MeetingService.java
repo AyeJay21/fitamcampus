@@ -16,6 +16,7 @@ public interface MeetingService {
 
     void deleteAllMeetings();
 
+    Iterable<Meeting> getAllMeetingsForUser(String username);
     Iterable<Meeting> getAllMeetings();
 
 }

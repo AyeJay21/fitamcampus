@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.UUID;
 
 public interface MeetingRepository extends CrudRepository<Meeting, UUID> {
-
+	Iterable<Meeting> findByCreatedBy(String createdBy);
 }

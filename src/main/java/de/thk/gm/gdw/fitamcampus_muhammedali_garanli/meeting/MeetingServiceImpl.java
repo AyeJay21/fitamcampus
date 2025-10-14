@@ -20,14 +20,6 @@ public class MeetingServiceImpl implements MeetingService {
         }
         UUID print = UUID.randomUUID();
         meeting.setId(print);
-        meeting.setName(meeting.name);
-        meeting.setOrt(meeting.ort);
-        meeting.setDate(meeting.date);
-        meeting.setSportArt(meeting.sportArt);
-        meeting.setInOrOut(meeting.inOrOut);
-        meeting.setDescription(meeting.description);
-        meeting.setTime(meeting.time);
-        System.out.println(print);
         meetingRepository.save(meeting);
         return meeting;
     }
@@ -85,6 +77,11 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     public void deleteAllMeetings() {
         meetingRepository.deleteAll();
+    }
+
+    @Override
+    public Iterable<Meeting> getAllMeetingsForUser(String username) {
+        return meetingRepository.findByCreatedBy(username);
     }
 
     @Override

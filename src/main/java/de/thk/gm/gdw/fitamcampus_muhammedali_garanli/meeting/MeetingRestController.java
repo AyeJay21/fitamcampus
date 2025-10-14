@@ -56,8 +56,6 @@ public class MeetingRestController {
         return ResponseEntity.ok(meeting);
     }
 
-
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMeeting(@PathVariable("id") UUID id) {
         Meeting meeting = meetingService.getMeeting(id);
