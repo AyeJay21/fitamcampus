@@ -3,6 +3,7 @@ package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.inbox;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message.Message;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ public class InboxController {
         this.inboxRepository = inboxRepository;
     }
 
+    @Autowired
     public MessageService messageService;
 
     @GetMapping(produces = "application/json")

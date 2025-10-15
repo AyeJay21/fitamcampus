@@ -2,6 +2,7 @@ package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.outbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,8 @@ public class OutboxController {
         this.outboxRepository = outboxRepository;
     }
 
-    MessageService messageService;
+    @Autowired
+    public MessageService messageService;
 
     @GetMapping(value = "/users/{username}/outbox", produces = "application/activity+json")
     public ResponseEntity<?> getOutbox(@PathVariable String username) throws IOException {
