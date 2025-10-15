@@ -41,7 +41,7 @@ public class InboxController {
 
         inbox.setObjectData(activity.get("object").toString());
         if (activity.get("object") instanceof Map<?,?> objectMap) {
-            inbox.setObjectData(mapper.writeValueAsString(mapper.writeValueAsString(objectMap)));
+            inbox.setObjectData(mapper.writeValueAsString(objectMap));
             inbox.setObjectType((String) objectMap.get("type"));
             inbox.setContent((String) objectMap.get("content"));
             inbox.setAttributedTo((String) objectMap.get("attributedTo"));
