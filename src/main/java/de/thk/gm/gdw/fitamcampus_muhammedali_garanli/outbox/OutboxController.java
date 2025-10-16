@@ -57,7 +57,7 @@ public class OutboxController {
             @RequestBody Map<String, Object> activity) throws IOException {
         System.out.println("OUTBOX ACTIVITY: " + activity);
         logger.info("OUTBOX ACTIVITY: " + activity);
-        logger.info("OUTBOX ACTIVITY: " + activity);
+        logger.info("OUTBOX ACTIVITY Should be here");
         Outbox item = new Outbox();
         item.setActivity(activity);
 
