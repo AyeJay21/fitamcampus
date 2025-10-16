@@ -2,6 +2,9 @@ package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.activityPub;
 
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.Actor;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.ActorService;
+import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message.Message;
+import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message.MessageRepository;
+import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message.MessageService;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.outbox.Outbox;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.outbox.OutboxRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,8 @@ public class ActivityPubController {
 
     @Autowired
     private OutboxRepository outboxRepository;
+    @Autowired
+    public MessageService messageService;
 
     @PostMapping("/activitypub/send-follow")
     public ResponseEntity<?> sendFollow(
@@ -102,6 +107,9 @@ public class ActivityPubController {
             Outbox outboxItem = new Outbox();
             outboxItem.setActivity(createActivity);
             outboxRepository.save(outboxItem);
+
+
+            messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
 
             return ResponseEntity.ok(Map.of(
                 "success", true, 
