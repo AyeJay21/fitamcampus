@@ -51,6 +51,7 @@ public class OutboxController {
     public ResponseEntity<String> postToOutbox(
             @PathVariable String username,
             @RequestBody Map<String, Object> activity) throws IOException {
+        System.out.println("OUTBOX ACTIVITY: " + activity);
         Outbox item = new Outbox();
         item.setActivity(activity);
 
