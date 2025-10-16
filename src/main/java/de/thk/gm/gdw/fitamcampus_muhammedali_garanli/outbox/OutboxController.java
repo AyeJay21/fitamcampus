@@ -54,9 +54,8 @@ public class OutboxController {
         Outbox item = new Outbox();
         item.setActivity(activity);
 
-
         if ("Note".equals(activity.get("type").toString())) {
-            String sender = (String) activity.get("attributedTo");
+            String sender = (String) activity.getOrDefault("attributedTo", activity.get("actor"));
             Map<String, Object> objectMap = (Map<String, Object>) activity.get("object");
             String content = (String) objectMap.get("content");
             Object toObj = activity.get("to");
@@ -65,7 +64,7 @@ public class OutboxController {
 
         } else if ("Create".equals(activity.get("type")) && activity.get("object") instanceof Map) {
             Map<String, Object> objectMap = (Map<String, Object>) activity.get("object");
-            String sender = (String) objectMap.get("attributedTo");
+            String sender = (String) objectMap.getOrDefault("attributedTo", activity.get("actor"));
             String content = (String) objectMap.get("content");
             Object toObj = objectMap.get("to");
             String reciever = (toObj instanceof List<?> && !((List<?>)toObj).isEmpty()) ? ((List<?>)toObj).get(0).toString() : toObj.toString();

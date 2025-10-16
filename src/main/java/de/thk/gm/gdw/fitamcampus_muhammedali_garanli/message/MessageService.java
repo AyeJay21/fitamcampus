@@ -13,7 +13,6 @@ public class MessageService {
         this.messageRepository = messageRepository;
     }
 
-
     public void saveMessage(String sender, String reciever, String text, Date timeStamp){
             if (sender == null || sender.isEmpty()) {
                 throw new IllegalArgumentException("Sender must not be null or empty");

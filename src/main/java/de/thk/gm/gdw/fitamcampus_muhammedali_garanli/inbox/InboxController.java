@@ -41,10 +41,7 @@ public class InboxController {
         Inbox inbox = new Inbox();
         Message message = new Message();
         ObjectMapper mapper = new ObjectMapper();
-        String sender = "";
         String reciever = "";
-        String text = "";
-        Date date = null;
 
         inbox.setActivity(activity);
         inbox.setUsername(username);
@@ -61,14 +58,24 @@ public class InboxController {
             inbox.setPublished((String) objectMap.get("published"));
             inbox.setTo((objectMap.get("to") != null) ? objectMap.get("to").toString() : null);
 
-            if ("Create".equals(activity.get("type")) && "Note".equals(objectMap.get("objectType"))) {
-                sender = (String) activity.get("actor");
-                reciever = (String) objectMap.get("to");
-                text = (String) objectMap.get("content");
-                //date = (Date) objectMap.get("published");
-                date = Date.from(Instant.parse(((String) objectMap.get("published")).toString()));
+            if ("Create".equals(type) && "Note".equals(objectMap.get("type"))) {
+                String sender = (String) activity.get("actor");
+                String receiver = null;
 
-                messageService.saveMessage(sender, reciever, text, date);
+                Object toObj = objectMap.get("to");
+                if (toObj instanceof List<?> toList && !toList.isEmpty()) {
+                    receiver = toList.get(0).toString();
+                } else if (toObj instanceof String s) {
+                    receiver = s;
+                }
+
+                String text = (String) objectMap.get("content");
+                Date date = null;
+                if (objectMap.get("published") != null) {
+                    date = Date.from(Instant.parse(objectMap.get("published").toString()));
+                }
+
+                messageService.saveMessage(sender, receiver, text, date);
             }
         }
 
