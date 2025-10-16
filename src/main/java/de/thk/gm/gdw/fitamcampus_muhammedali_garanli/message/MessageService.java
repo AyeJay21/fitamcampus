@@ -27,9 +27,10 @@ public class MessageService {
                 throw new IllegalArgumentException("Timestamp must not be null");
             }
             Message message = new Message();
+
             message.setSender(sender);
             message.setReciever(reciever);
-            message.setText(text);
+            message.setText(text.replaceAll("<[^>]*>", ""));
             message.setTimeStamp(timeStamp);
             messageRepository.save(message);
     }
