@@ -67,7 +67,14 @@ public class OutboxController {
             String sender = (String) objectMap.getOrDefault("attributedTo", activity.get("actor"));
             String content = (String) objectMap.get("content");
             Object toObj = objectMap.get("to");
+            if (toObj == null) {
+                toObj = activity.get("to");
+            }
             String reciever = (toObj instanceof List<?> && !((List<?>)toObj).isEmpty()) ? ((List<?>)toObj).get(0).toString() : toObj.toString();
+
+            System.out.println("[OUTBOX DEBUG] Sender: " + sender);
+            System.out.println("[OUTBOX DEBUG] Receiver: " + reciever);
+            System.out.println("[OUTBOX DEBUG] Content: " + content);
             messageService.saveMessage(sender, reciever, content, new Date());
         }
 

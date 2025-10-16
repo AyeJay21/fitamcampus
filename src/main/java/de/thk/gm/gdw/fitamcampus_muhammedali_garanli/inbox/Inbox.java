@@ -20,6 +20,7 @@ public class Inbox {
     private String username;
     private String type;
     private String actor;
+    @Lob
     private String objectData;
     private String activityId;
     private String published;
