@@ -2,6 +2,8 @@ package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.outbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message.MessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,8 @@ public class OutboxController {
     public OutboxController(OutboxRepository outboxRepository) {
         this.outboxRepository = outboxRepository;
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(OutboxController.class);
 
     @Autowired
     public MessageService messageService;
@@ -52,6 +56,8 @@ public class OutboxController {
             @PathVariable String username,
             @RequestBody Map<String, Object> activity) throws IOException {
         System.out.println("OUTBOX ACTIVITY: " + activity);
+        logger.info("OUTBOX ACTIVITY: " + activity);
+        logger.info("OUTBOX ACTIVITY: " + activity);
         Outbox item = new Outbox();
         item.setActivity(activity);
 
@@ -73,9 +79,9 @@ public class OutboxController {
             }
             String reciever = (toObj instanceof List<?> && !((List<?>)toObj).isEmpty()) ? ((List<?>)toObj).get(0).toString() : toObj.toString();
 
-            System.out.println("[OUTBOX DEBUG] Sender: " + sender);
-            System.out.println("[OUTBOX DEBUG] Receiver: " + reciever);
-            System.out.println("[OUTBOX DEBUG] Content: " + content);
+            logger.info("[OUTBOX DEBUG] Sender: " + sender);
+            logger.info("[OUTBOX DEBUG] Receiver: " + reciever);
+            logger.info("[OUTBOX DEBUG] Content: " + content);
             messageService.saveMessage(sender, reciever, content, new Date());
         }
 
