@@ -26,11 +26,7 @@
         <h3 class="username">${username}</h3>
         <div id="followerList" onclick="window.location.href='/users/{username}/chats'">Lade Follower...</div>
     </div>
-    <div class="chat">
-        <#list chatMessages as chatMessage>
-            <p>${chatMessage.text}</p>
-        </#list>
-    </div>
+
 </div>
 
 <script>
@@ -50,7 +46,7 @@
             }
             followers.forEach(follower => {
                 const p = document.createElement("p");
-                
+
                 p.textContent = follower.followerUrl;
                 p.classList.add('follower');
                 p.addEventListener("click", () => {
