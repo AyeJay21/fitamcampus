@@ -17,7 +17,7 @@
 <div class="mainContainer">
     <div class="follower">
         <h3 class="username">${username}</h3>
-        <div id="followerList" onclick="window.location.href='/users/{username}/chats'">Lade Follower...</div>
+        <div id="followerList">Lade Follower...</div>
     </div>
     <div class="chat">
         <#if chatMessages??>
@@ -45,21 +45,26 @@
             }
             followers.forEach(follower => {
                 const p = document.createElement("p");
-                p.textContent = follower.followerUrl;
-                p.classList.add('follower');
+                // display a readable label if available
+                p.textContent = follower.username || follower.followerUrl || follower.id || "Unbekannt";
+                p.classList.add('follower-item');
+                // store the receiver (actor URL or identifier)
+                const receiver = follower.followerUrl || follower.id || follower.username;
+                p.dataset.receiver = receiver;
+                p.style.cursor = 'pointer';
+                p.addEventListener('click', () => {
+                    // navigate to the chat view and include the receiver as query param
+                    const url = `/users/${encodeURIComponent(username)}/chats?receiver=${encodeURIComponent(receiver)}`;
+                    window.location.href = url;
+                });
                 listDiv.appendChild(p);
             });
         })
         .catch(err => {
             listDiv.textContent = "Fehler: " + err.message;
         });
-
-    fetch(`/users/${username}/chats`)
-        .then(res => {
-            if (!res.ok) throw new Error("Fehler beim Laden");
-            return res.json();
-        })
-        .then(chat => chat)
+    // The page will be reloaded when the user clicks a follower and the server
+    // will render the chat view with the optional ?receiver=... query parameter.
 </script>
 </body>
 </html>
