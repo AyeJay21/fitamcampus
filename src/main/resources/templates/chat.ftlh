@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat</title>
     <style>
-        body { margin: 0; padding: 1rem; font-family: sans-serif; }
-        .follower p { margin: 0.25rem 0; }
+        body {
+            margin: 0;
+            padding: 1rem;
+            font-family: sans-serif;
+        }
+
+        .follower p {
+            margin: 0.25rem 0;
+        }
 
 
     </style>
@@ -17,14 +24,12 @@
 <div class="mainContainer">
     <div class="follower">
         <h3 class="username">${username}</h3>
-        <div id="followerList">Lade Follower...</div>
+        <div id="followerList" onclick="window.location.href='/users/{username}/chats'">Lade Follower...</div>
     </div>
     <div class="chat">
-        <#if chatMessages??>
         <#list chatMessages as chatMessage>
             <p>${chatMessage.text}</p>
         </#list>
-        </#if>
     </div>
 </div>
 
@@ -45,26 +50,46 @@
             }
             followers.forEach(follower => {
                 const p = document.createElement("p");
-                // display a readable label if available
-                p.textContent = follower.username || follower.followerUrl || follower.id || "Unbekannt";
-                p.classList.add('follower-item');
-                // store the receiver (actor URL or identifier)
-                const receiver = follower.followerUrl || follower.id || follower.username;
-                p.dataset.receiver = receiver;
-                p.style.cursor = 'pointer';
-                p.addEventListener('click', () => {
-                    // navigate to the chat view and include the receiver as query param
-                    const url = `/users/${encodeURIComponent(username)}/chats?receiver=${encodeURIComponent(receiver)}`;
-                    window.location.href = url;
-                });
+                
+                p.textContent = follower.followerUrl;
+                p.classList.add('follower');
+                p.addEventListener("click", () => {
+                    const body = {follower: follower.followerUrl}
+
+                    fetch(`/users/${username}/chats`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(body)
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error("Fehler beim Senden");
+                            return res.json();
+                        })
+                        .then(data => {
+                            console.log("Antwort vom Server:", data);
+                            // Optional: z. B. Chat anzeigen oder Seite wechseln
+                            // window.location.href = `/users/${username}/chats`;
+                        })
+                        .catch(err => {
+                            console.error("Fehler:", err);
+                        });
+
+                })
                 listDiv.appendChild(p);
             });
         })
         .catch(err => {
             listDiv.textContent = "Fehler: " + err.message;
         });
-    // The page will be reloaded when the user clicks a follower and the server
-    // will render the chat view with the optional ?receiver=... query parameter.
+
+    fetch(`/users/${username}/chats`)
+        .then(res => {
+            if (!res.ok) throw new Error("Fehler beim Laden");
+            return res.json();
+        })
+        .then(chat => chat)
 </script>
 </body>
 </html>

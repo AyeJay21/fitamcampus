@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
@@ -34,26 +35,21 @@ public class ChatController {
         model.addAttribute("username", username);
         return "chat";
     }
-
     @GetMapping("/users/{username}/chats")
-    public String getChat(@PathVariable String username,
-                          @RequestParam(name = "receiver", required = false) String receiver,
-                          Model model){
+    public String getChat(@PathVariable String username, @RequestParam(required = false) String receiver, Model model) {
         List<Message> allMessages = messageRepository.findAll();
-        String userA = username;
-        String userB = receiver;
 
-        model.addAttribute("chatMessages", Collections.emptyList());
-
+        List<Message> chatMessages = Collections.emptyList();
         if (receiver != null && !receiver.isBlank()) {
-            List<Message> chatMessages = allMessages.stream()
-                    .filter(m -> (m.getSender().equals(userA) && m.getReciever().equals(userB)) ||
-                            (m.getSender().equals(userB) && m.getReciever().equals(userA)))
+            chatMessages = allMessages.stream()
+                    .filter(m -> (m.getSender().equals(username) && m.getReciever().equals(receiver)) ||
+                            (m.getSender().equals(receiver) && m.getReciever().equals(username)))
                     .sorted(Comparator.comparing(Message::getTimeStamp))
                     .collect(Collectors.toList());
-
-            model.addAttribute("chatMessages", chatMessages);
         }
+
+        model.addAttribute("chatMessages", chatMessages);
         return "chat";
     }
+
 }
