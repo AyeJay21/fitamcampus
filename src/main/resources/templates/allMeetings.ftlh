@@ -234,9 +234,10 @@
 <body>
 <div class="container">
     <nav>
-        <a href="/meetingSite">← Zurück zum Hauptmenü</a> |
-        <a href="/meetings">Alle Meetings</a> |
-        <a href="/logout">Logout</a>
+    <a onclick="window.location.href='/users/chats'">Chat</a> |
+    <a href="/meetingSite">← Zurück zum Hauptmenü</a> |
+    <a href="/meetings">Alle Meetings</a> |
+    <a href="/logout">Logout</a>
     </nav>
 
     <h1 class="page-title">Alle Meetings</h1>

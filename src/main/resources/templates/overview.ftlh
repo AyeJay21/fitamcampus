@@ -7,6 +7,7 @@
 </head>
 <body>
 <nav style="padding: 15px 20px; background: white; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;">
+    <a onclick="window.location.href='/users/chats'">Chat</a> |
     <a href="/meetingSite" style="color: #3498db; text-decoration: none; margin: 0 15px; font-weight: 500; transition: color 0.3s;">← Zurück zum Hauptmenü</a> |
     <a href="/meetings" style="color: #3498db; text-decoration: none; margin: 0 15px; font-weight: 500; transition: color 0.3s;">Alle Meetings</a> |
     <a href="/logout" style="color: #e74c3c; text-decoration: none; margin: 0 15px; font-weight: 500; transition: color 0.3s;">Logout</a>

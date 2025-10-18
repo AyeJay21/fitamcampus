@@ -7,9 +7,11 @@ import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.activityPub.RemoteActorServ
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.ActorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,16 +22,15 @@ public class FollowerController {
     @Autowired
     private FollowerRepository followerRepository;
 
-        @Autowired
-        private ActorService actorService;
+    @Autowired
+    private ActorService actorService;
 
-        @Autowired
-        private RemoteActorService remoteActorService;
+    @Autowired
+    private RemoteActorService remoteActorService;
 
-        @Autowired
-        private ActivityPubDeliveryService deliveryService;
+    @Autowired
+    private ActivityPubDeliveryService deliveryService;
 
-    // Follower-Request annehmen und Accept-Activity senden
     @PostMapping("/accept")
     public ResponseEntity<?> acceptFollower(@PathVariable String username, @RequestBody Map<String, String> body) {
         String followerUrl = body.get("followerUrl");
@@ -73,14 +74,12 @@ public class FollowerController {
                 targetActorUrl = remoteActorService.resolveActorUrl(followerUrl);
             }
 
-            // Accept-Aktivität bauen
-            java.util.Map<String, Object> accept = new java.util.HashMap<>();
+            java.util.Map<String, Object> accept = new HashMap<>();
             accept.put("@context", "https://www.w3.org/ns/activitystreams");
             accept.put("id", actorId + "/activities/accept-" + UUID.randomUUID());
             accept.put("type", "Accept");
             accept.put("actor", actorId);
-            // Das Objekt ist die ursprüngliche Follow-Aktivität
-            java.util.Map<String, Object> followObj = new java.util.HashMap<>();
+            Map<String, Object> followObj = new HashMap<>();
             followObj.put("@context", "https://www.w3.org/ns/activitystreams");
             //followObj.put("id", );
             followObj.put("type", "Follow");
@@ -88,7 +87,6 @@ public class FollowerController {
             followObj.put("object", actorId);
             accept.put("object", followObj);
 
-            // Senden
             deliveryService.sendToInbox(targetInbox, accept, actorId, privateKey);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", "Follower accepted, but failed to federate: " + e.getMessage()));
@@ -97,10 +95,4 @@ public class FollowerController {
         return ResponseEntity.ok(Map.of("success", true, "followerUrl", followerUrl));
     }
 
-    // Alle Follower anzeigen
-    @GetMapping
-    public ResponseEntity<?> getFollowers(@PathVariable String username) {
-        List<Follower> followers = followerRepository.findByUsername(username);
-        return ResponseEntity.ok(followers);
-    }
 }

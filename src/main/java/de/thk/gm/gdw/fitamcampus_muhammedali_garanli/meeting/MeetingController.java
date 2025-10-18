@@ -26,7 +26,7 @@ public class MeetingController {
     public final WeatherService weatherService;
 
     @Autowired
-    public MeetingController(MeetingService meetingService, CommentService commentService,WeatherService weatherService) {
+    public MeetingController(MeetingService meetingService, CommentService commentService, WeatherService weatherService) {
         this.meetingService = meetingService;
         this.commentService = commentService;
         this.weatherService = weatherService;
@@ -35,7 +35,6 @@ public class MeetingController {
     @ResponseStatus(HttpStatus.FOUND)
     @PostMapping
     public String addMeeting(Meeting meeting, Model model, HttpSession session) {
-        // Setze den Ersteller
         String username = LoginController.getCurrentUser(session).getUsername();
         meeting.setCreatedBy(username);
         model.addAttribute("meeting", meetingService.createMeeting(meeting));
@@ -53,10 +52,18 @@ public class MeetingController {
         if (meetings == null) {
             throw new Exception("Meeting ist leer");
         }
-        for(Meeting meeting: meetings){
-            Weather weather = weatherService.getWeather(meeting.date, meeting.getOrt(),meeting.time);
-            weathers.put(meeting.getId().toString(), weather);
-            System.out.println("WeatherMeetingId: " + meeting.getId() + "Weather: " + weather.getTemperature());
+
+        for (Meeting meeting : meetings) {
+            try {
+                Weather weather = weatherService.getWeather(meeting.date, meeting.getOrt(), meeting.time);
+                if (weather == null) {
+                    throw new Exception("Wetter liefert keine Daten");
+                }
+                weathers.put(meeting.getId().toString(), weather);
+                System.out.println("WeatherMeetingId: " + meeting.getId() + "Weather: " + weather.getTemperature());
+            } catch (Exception e) {
+                System.out.println("Wetter konnte für ein Meeting nicht geladen werden: " + e.getMessage());
+            }
         }
         model.addAttribute("weathers", weathers);
         model.addAttribute("meetings", meetings);
@@ -82,13 +89,17 @@ public class MeetingController {
         }
         model.addAttribute("meeting", meeting);
         model.addAttribute("comments", commentService.getCommentByMeeting(id));
-        Weather weather = weatherService.getWeather(meeting.date, meeting.getOrt(),meeting.time);
-        if(weather == null){
-            throw new Exception("Wetter liefert keine Daten");
+        try {
+            Weather weather = weatherService.getWeather(meeting.date, meeting.getOrt(), meeting.time);
+            if (weather == null) {
+                throw new Exception("Wetter liefert keine Daten");
+            }
+            model.addAttribute("weathers", weather);
+            model.addAttribute("latitude", String.valueOf(weather.getLatitude()).replace(',', '.'));
+            model.addAttribute("longitude", String.valueOf(weather.getLongitude()).replace(',', '.'));
+        }catch(Exception e){
+            System.out.println("Wetter konnte für ein Meeting nicht geladen werden: " + e.getMessage());
         }
-        model.addAttribute("weathers", weather);
-        model.addAttribute("latitude", String.valueOf(weather.getLatitude()).replace(',', '.'));
-        model.addAttribute("longitude", String.valueOf(weather.getLongitude()).replace(',', '.'));
         return "overview";
     }
 
