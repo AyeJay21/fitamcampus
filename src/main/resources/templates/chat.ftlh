@@ -7,6 +7,8 @@
     <style>
         body { margin: 0; padding: 1rem; font-family: sans-serif; }
         .follower p { margin: 0.25rem 0; }
+
+
     </style>
 </head>
 <body>
@@ -14,10 +16,14 @@
 
 <div class="mainContainer">
     <div class="follower">
-        <h3>Follower:</h3>
-        <div id="followerList">Lade Follower...</div>
+        <h3 class="username">${username}</h3>
+        <div id="followerList" onclick="window.location.href='/users/{username}/chats'">Lade Follower...</div>
     </div>
-    <div class="chat"></div>
+    <div class="chat">
+        <#list chatMessages as chatMessage>
+            <p>${chatMessage}</p>
+        </#list>
+    </div>
 </div>
 
 <script>
@@ -38,12 +44,20 @@
             followers.forEach(follower => {
                 const p = document.createElement("p");
                 p.textContent = follower.followerUrl;
+                p.classList.add('follower');
                 listDiv.appendChild(p);
             });
         })
         .catch(err => {
             listDiv.textContent = "Fehler: " + err.message;
         });
+
+    fetch(`/users/${username}/chats`)
+        .then(res => {
+            if (!res.ok) throw new Error("Fehler beim Laden");
+            return res.json();
+        })
+        .then(chat => chat)
 </script>
 </body>
 </html>
