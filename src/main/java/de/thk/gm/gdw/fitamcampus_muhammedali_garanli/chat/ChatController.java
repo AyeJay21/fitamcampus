@@ -40,13 +40,15 @@ public class ChatController {
         String userA = username;
         String userB = receiver;
 
-        List<Message> chatMessages = allMessages.stream()
-                .filter(m -> (m.getSender().equals(userA) && m.getReciever().equals(userB)) ||
-                        (m.getSender().equals(userB) && m.getReciever().equals(userA)))
-                .sorted(Comparator.comparing(Message::getTimeStamp))
-                .collect(Collectors.toList());
+        if (receiver != null && !receiver.isBlank()) {
+            List<Message> chatMessages = allMessages.stream()
+                    .filter(m -> (m.getSender().equals(userA) && m.getReciever().equals(userB)) ||
+                            (m.getSender().equals(userB) && m.getReciever().equals(userA)))
+                    .sorted(Comparator.comparing(Message::getTimeStamp))
+                    .collect(Collectors.toList());
 
-        model.addAttribute("chatMessages", chatMessages);
+            model.addAttribute("chatMessages", chatMessages);
+        }
         return "chat";
     }
 }
