@@ -20,9 +20,11 @@
         <div id="followerList" onclick="window.location.href='/users/{username}/chats'">Lade Follower...</div>
     </div>
     <div class="chat">
+        <#if chatMessages??>
         <#list chatMessages as chatMessage>
             <p>${chatMessage.text}</p>
         </#list>
+        </#if>
     </div>
 </div>
 

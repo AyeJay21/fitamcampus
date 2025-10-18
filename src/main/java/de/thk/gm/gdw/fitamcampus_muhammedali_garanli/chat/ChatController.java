@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +40,8 @@ public class ChatController {
         List<Message> allMessages = messageRepository.findAll();
         String userA = username;
         String userB = receiver;
+
+        model.addAttribute("chatMessages", Collections.emptyList());
 
         if (receiver != null && !receiver.isBlank()) {
             List<Message> chatMessages = allMessages.stream()
