@@ -35,9 +35,9 @@
                 listDiv.textContent = "Keine Follower gefunden.";
                 return;
             }
-            followers.forEach(f => {
+            followers.forEach(follower => {
                 const p = document.createElement("p");
-                p.textContent = f.username ?? JSON.stringify(f);
+                p.textContent = follower.username;
                 listDiv.appendChild(p);
             });
         })
