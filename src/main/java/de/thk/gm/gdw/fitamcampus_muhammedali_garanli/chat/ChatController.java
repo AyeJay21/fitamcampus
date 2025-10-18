@@ -22,21 +22,24 @@ public class ChatController {
 
     private final MessageRepository messageRepository;
 
-    public ChatController(MessageRepository messageRepository){
+    public ChatController(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
 
     @GetMapping("/users/chats")
     public String openChat(Model model, HttpSession session) throws Exception {
         String username = LoginController.getCurrentUser(session).getUsername();
-        if(username == null || username.isEmpty()) {
-           throw new Exception("Username is null or empty");
+        if (username == null || username.isEmpty()) {
+            throw new Exception("Username is null or empty");
         }
         model.addAttribute("username", username);
         return "chat";
     }
+
     @GetMapping("/users/{username}/chats")
-    public String getChat(@PathVariable String username, @RequestParam(required = false) String receiver, Model model) {
+    public String getChat(@PathVariable String username,
+                          @RequestParam(required = false) String receiver,
+                          Model model) {
         List<Message> allMessages = messageRepository.findAll();
 
         List<Message> chatMessages = Collections.emptyList();
