@@ -21,7 +21,7 @@
     </div>
     <div class="chat">
         <#list chatMessages as chatMessage>
-            <p>${chatMessage}</p>
+            <p>${chatMessage.text}</p>
         </#list>
     </div>
 </div>
