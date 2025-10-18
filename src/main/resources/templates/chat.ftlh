@@ -37,7 +37,7 @@
             }
             followers.forEach(follower => {
                 const p = document.createElement("p");
-                p.textContent = follower.username;
+                p.textContent = follower.followerUrl;
                 listDiv.appendChild(p);
             });
         })
