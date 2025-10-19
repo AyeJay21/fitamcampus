@@ -106,7 +106,7 @@ function loadFollowers(username) {
 function loadMessages(username, receiverUrl, displayName) {
     chatTitle.textContent = `Chat mit displayName` + displayName;
     messageList.textContent = 'Lade Nachrichten...';
-    fetch(`/users/${username}/chats?receiver=${encodeURIComponent(receiverUrl)}`)
+    fetch(`/users/${username}/chats?receiver=` + encodeURIComponent(receiverUrl))
         .then(res => res.json())
         .then(msgs => {
             if (!Array.isArray(msgs) || msgs.length === 0) {
