@@ -41,6 +41,8 @@ public class ChatController {
     public String getChat(@PathVariable String username,
                           @RequestParam(required = false) String receiver,
                           Model model) {
+        // expose username to the template so client-side JS can call /users/{username}/followers
+        model.addAttribute("username", username);
         List<Message> allMessages = messageRepository.findAll();
 
         List<Message> chatMessages = Collections.emptyList();
