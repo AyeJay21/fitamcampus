@@ -23,48 +23,91 @@
 
 <div class="mainContainer">
     <div class="followerContainer">
-        <h3 class="username">${username}</h3>
-    <div id="followerList">Lade Follower...</div>
+        <h3 class="username" id="currentUser"></h3>
+        <div id="followerList">Lade Follower...</div>
     </div>
 
+    <div class="chatContainer">
+        <h3 id="chatTitle">Wähle einen Kontakt</h3>
+        <div id="messageList" class="no-chat">Keine Nachrichten</div>
+    </div>
 </div>
 
 <script>
-    const username = "${username}";
-    const listDiv = document.getElementById("followerList");
+    const username = document.body.dataset.username || "testuser";
+    let selectedReceiver = null;
 
+    document.getElementById("currentUser").textContent = username;
+
+    // Follower laden
     fetch(`/users/${username}/followers`)
-        .then(res => {
-            if (!res.ok) throw new Error("Fehler beim Laden");
-            return res.json();
-        })
+        .then(res => res.json())
         .then(followers => {
+            const listDiv = document.getElementById("followerList");
             listDiv.innerHTML = "";
+
             if (followers.length === 0) {
                 listDiv.textContent = "Keine Follower gefunden.";
                 return;
             }
+
             followers.forEach(follower => {
                 const p = document.createElement("p");
-
                 p.textContent = follower.followerUrl;
                 p.dataset.followerUrl = follower.followerUrl;
                 p.classList.add('follower');
+
+                p.addEventListener("click", () => {
+                    document.querySelectorAll(".follower").forEach(el => el.classList.remove("active"));
+                    p.classList.add("active");
+                    selectedReceiver = follower.followerUrl;
+                    loadChat(username, selectedReceiver);
+                });
+
                 listDiv.appendChild(p);
             });
         })
         .catch(err => {
-            listDiv.textContent = "Fehler: " + err.message;
+            console.error("Fehler beim Laden der Follower:", err);
         });
-</script>
-<script>
-    const pElements = document.querySelectorAll(".follower");
-    pElements.forEach(p => {
-        p.addEventListener("click", () => {
-            const url = e.currentTarget.dataset.followerUrl;
-            console.log('geklickt:', url);
-        });
-    });
+    
+    function loadChat(sender, receiver) {
+        document.getElementById("chatTitle").textContent = `Chat mit ${receiver}`;
+
+        fetch(`/users/${sender}/chats?receiver=${encodeURIComponent(receiver)}`)
+            .then(res => res.json())
+            .then(messages => {
+                const messageList = document.getElementById("messageList");
+                messageList.innerHTML = "";
+
+                if (messages.length === 0) {
+                    messageList.className = "no-chat";
+                    messageList.textContent = "Keine Nachrichten mit diesem Kontakt";
+                    return;
+                }
+
+                messageList.className = "";
+                messages.forEach(msg => {
+                    const msgDiv = document.createElement("div");
+                    msgDiv.classList.add("message");
+                    msgDiv.classList.add(msg.sender === username ? "sent" : "received");
+
+                    msgDiv.innerHTML = `
+                            <div class="message-sender">${msg.sender}</div>
+                            <div>${msg.text}</div>
+                            <div class="message-time">${new Date(msg.timeStamp).toLocaleString('de-DE')}</div>
+                        `;
+
+                    messageList.appendChild(msgDiv);
+                });
+
+                // Scroll zum Ende
+                messageList.scrollTop = messageList.scrollHeight;
+            })
+            .catch(err => {
+                console.error("Fehler beim Laden des Chats:", err);
+            });
+    }
 </script>
 </body>
 </html>
