@@ -27,10 +27,6 @@
         <div id="followerList" onclick="window.location.href='/users/${username}/chats'">Lade Follower...</div>
     </div>
 
-    <div id="chatContainer">
-        <p>Wähle einen Follower, um den Chat zu laden.</p>
-    </div>
-
 </div>
 
 <script>
@@ -54,34 +50,8 @@
                 p.textContent = follower.followerUrl;
                 p.classList.add('follower');
                 p.addEventListener("click", () => {
-                    // Fetch messages via the JSON endpoint and render into #chatContainer
-                    const url = `/users/${encodeURIComponent(username)}/chats/messages?receiver=${encodeURIComponent(follower.followerUrl)}`;
-                    const chatContainer = document.getElementById('chatContainer');
-                    chatContainer.innerHTML = '<p>Lade Nachrichten...</p>';
-                    fetch(url)
-                        .then(res => {
-                            if (!res.ok) throw new Error('Fehler beim Laden der Nachrichten');
-                            return res.json();
-                        })
-                        .then(messages => {
-                            chatContainer.innerHTML = '';
-                            if (!messages || messages.length === 0) {
-                                chatContainer.textContent = 'Keine Nachrichten.';
-                                return;
-                            }
-                            messages.forEach(m => {
-                                const div = document.createElement('div');
-                                // Passe die Felder an deine Message-Klasse an
-                                const sender = m.sender || m.from || '';
-                                const text = m.text || m.message || m.content || '';
-                                const time = m.timeStamp || m.time || '';
-                                div.textContent = `${sender}: ${text}` + (time ? ` (${time})` : '');
-                                chatContainer.appendChild(div);
-                            });
-                        })
-                        .catch(err => {
-                            chatContainer.textContent = 'Fehler: ' + err.message;
-                        });
+                    fetch(`/users/${username}/chats?receiver=${follower.followerUrl}`)
+
                 });
                 listDiv.appendChild(p);
             });
