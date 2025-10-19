@@ -24,7 +24,7 @@
 <div class="mainContainer">
     <div class="follower">
         <h3 class="username">${username}</h3>
-        <div id="followerList" onclick="window.location.href='/users/${username}/chats'">Lade Follower...</div>
+        <div id="followerList" onclick="window.location.href='/users/{username}/chats'">Lade Follower...</div>
     </div>
 
 </div>
@@ -50,15 +50,36 @@
                 p.textContent = follower.followerUrl;
                 p.classList.add('follower');
                 p.addEventListener("click", () => {
-                    fetch(`/users/${username}/chats?receiver=${follower.followerUrl}`)
+                    const body = {follower: follower.followerUrl}
 
-                });
+                    fetch(`/users/${username}/chats`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(body)
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error("Fehler beim Senden");
+                            return res.json();
+                        })
+                        .then(data => {
+                            console.log("Antwort vom Server:", data);
+                            // Optional: z. B. Chat anzeigen oder Seite wechseln
+                            // window.location.href = `/users/${username}/chats`;
+                        })
+                        .catch(err => {
+                            console.error("Fehler:", err);
+                        });
+
+                })
                 listDiv.appendChild(p);
             });
         })
         .catch(err => {
             listDiv.textContent = "Fehler: " + err.message;
         });
+
 </script>
 </body>
 </html>

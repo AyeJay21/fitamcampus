@@ -8,11 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -39,7 +38,7 @@ public class ChatController {
 
     @GetMapping("/users/{username}/chats")
     public String getChat(@PathVariable String username,
-                          @RequestParam(required = false) String receiver,
+                          @RequestParam String receiver,
                           Model model) {
         List<Message> allMessages = messageRepository.findAll();
 
@@ -53,26 +52,8 @@ public class ChatController {
         }
         for (Message message: chatMessages) {
             System.out.println(message.getText());
-        }
+        };
         model.addAttribute("chatMessages", chatMessages);
         return "chat";
-    }
-
-    @GetMapping(value = "/users/{username}/chats/messages", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Message>> getChatMessages(@PathVariable String username,
-                                                         @RequestParam(required = false) String receiver) {
-        List<Message> allMessages = messageRepository.findAll();
-
-        if (receiver == null || receiver.isBlank()) {
-            return ResponseEntity.ok(Collections.emptyList());
-        }
-
-        List<Message> chatMessages = allMessages.stream()
-                .filter(m -> (m.getSender().equals(username) && m.getReciever().equals(receiver)) ||
-                        (m.getSender().equals(receiver) && m.getReciever().equals(username)))
-                .sorted(Comparator.comparing(Message::getTimeStamp))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(chatMessages);
     }
 }
