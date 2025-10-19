@@ -49,10 +49,10 @@
 
                 p.textContent = follower.followerUrl;
                 p.classList.add('follower');
-                p.addEventListener("click", () => {
-                    const targetUrl = `/users/${encodeURIComponent(username)}/chats?receiver=${encodeURIComponent(follower.followerUrl)}`;
-                    window.location.href = targetUrl;
-                });
+                <#--p.addEventListener("click", () => {-->
+                <#--    const targetUrl = `/users/${encodeURIComponent(username)}/chats?receiver=${encodeURIComponent(follower.followerUrl)}`;-->
+                <#--    window.location.href = targetUrl;-->
+                <#--});-->
                 listDiv.appendChild(p);
             });
         })
