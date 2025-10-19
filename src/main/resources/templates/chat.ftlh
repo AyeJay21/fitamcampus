@@ -24,7 +24,7 @@
 <div class="mainContainer">
     <div class="follower">
         <h3 class="username">${username}</h3>
-    <div id="followerList" onclick="window.location.href='/users/${username}/chats'">Lade Follower...</div>
+    <div id="followerList">Lade Follower...</div>
     </div>
 
 </div>

@@ -34,7 +34,7 @@ public class ChatController {
     }
 
     @GetMapping("/users/{username}/chats")
-    public String getChat(@PathVariable String username,
+    public List<?> getChat(@PathVariable String username,
                           @RequestParam(required = false) String receiver,
                           Model model) {
         model.addAttribute("username", username);
@@ -52,6 +52,6 @@ public class ChatController {
             System.out.println(message.getText());
         }
         model.addAttribute("chatMessages", chatMessages);
-        return "chat";
+        return chatMessages;
     }
 }
