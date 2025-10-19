@@ -23,14 +23,14 @@
 
 <div class="mainContainer">
     <div class="followerContainer">
-        <h3 class="username">${username}</h3>
+    <h3 class="username" id="currentUser"></h3>
     <div id="followerList">Lade Follower...</div>
     </div>
 
 </div>
 
 <script>
-    const username = "${username}";
+    // Username wird dynamisch aus dem DOM gelesen
     const listDiv = document.getElementById("followerList");
 
     fetch(`/users/${username}/followers`)
@@ -60,7 +60,7 @@
 function followerUrlToReceiver(url) {
     if (typeof url === 'string' && url.includes('@')) {
         const [name, domain] = url.split('@');
-        return `https://${domain}/users/${name}`;
+    return "https://" + domain + "/users/" + name;
     }
     return url;
 }
