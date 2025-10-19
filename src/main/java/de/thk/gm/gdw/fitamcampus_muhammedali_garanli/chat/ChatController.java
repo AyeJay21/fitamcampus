@@ -37,7 +37,6 @@ public class ChatController {
     public String getChat(@PathVariable String username,
                           @RequestParam(required = false) String receiver,
                           Model model) {
-        // expose username for client-side JS/templates
         model.addAttribute("username", username);
         List<Message> allMessages = messageRepository.findAll();
 

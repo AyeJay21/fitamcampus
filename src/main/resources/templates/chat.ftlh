@@ -49,17 +49,20 @@
 
                 p.textContent = follower.followerUrl;
                 p.classList.add('follower');
-                p.addEventListener("click", () => {
-                    const targetUrl = '/users/' + encodeURIComponent(username) + '/chats?receiver=' + encodeURIComponent(follower.followerUrl);
-                    window.location.href = targetUrl;
-                });
                 listDiv.appendChild(p);
             });
         })
         .catch(err => {
             listDiv.textContent = "Fehler: " + err.message;
         });
-
+</script>
+<script>
+    const pElements = document.querySelectorAll(".follower");
+    pElements.forEach(p => {
+        p.addEventListener("click", () => {
+            console.log("geklickt:", p.textContent);
+        });
+    });
 </script>
 </body>
 </html>
