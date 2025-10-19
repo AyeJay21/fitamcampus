@@ -24,7 +24,7 @@
 
 <div class="mainContainer">
     <div class="followerContainer">
-        <h3 class="username" id="currentUser"></h3>
+    <h3 class="username" id="currentUser">${username}</h3>
         <div id="followerList">Lade Follower...</div>
     </div>
     <div class="chatContainer">
