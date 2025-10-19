@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -44,7 +45,7 @@ public class ChatController {
         List<Message> allMessages = messageRepository.findAll();
 
         // Hilfsfunktion: name@domain zu https://domain/users/name
-        java.util.function.Function<String, String> toUrl = (str) -> {
+        Function<String, String> toUrl = (str) -> {
             if (str != null && str.contains("@")) {
                 String[] parts = str.split("@");
                 if (parts.length == 2) {
@@ -70,15 +71,21 @@ public class ChatController {
                 receiverShort = null;
             }
 
+            // Hilfsfunktionen für alle Varianten des eigenen Users
+            String usernameUrl = username.contains("@") ? toUrl.apply(username) : "https://activitypub.alluneedspot.com/users/" + username;
+            String usernameShort = username.contains("@") ? username : null;
+
             chatMessages = allMessages.stream()
                 .filter(m -> {
                     String senderUrl = toUrl.apply(m.getSender());
                     String recieverUrl = toUrl.apply(m.getReciever());
-                    // Vergleiche sowohl als URL als auch als name@domain
-                    return ((senderUrl.equals(toUrl.apply(username)) && recieverUrl.equals(receiverUrl)) ||
-                            (senderUrl.equals(receiverUrl) && recieverUrl.equals(toUrl.apply(username))) ||
-                            (receiverShort != null && m.getSender().equals(username) && m.getReciever().equals(receiverShort)) ||
-                            (receiverShort != null && m.getSender().equals(receiverShort) && m.getReciever().equals(username)));
+                    // Vergleiche alle Varianten: plain, URL, name@domain
+                    boolean isOwnSender = m.getSender().equals(username) || senderUrl.equals(usernameUrl) || (usernameShort != null && m.getSender().equals(usernameShort));
+                    boolean isOwnReceiver = m.getReciever().equals(username) || recieverUrl.equals(usernameUrl) || (usernameShort != null && m.getReciever().equals(usernameShort));
+                    boolean isReceiverMatch = m.getSender().equals(receiver) || senderUrl.equals(receiverUrl) || (receiverShort != null && m.getSender().equals(receiverShort));
+                    boolean isSenderMatch = m.getReciever().equals(receiver) || recieverUrl.equals(receiverUrl) || (receiverShort != null && m.getReciever().equals(receiverShort));
+
+                    return ((isOwnSender && isSenderMatch) || (isOwnReceiver && isReceiverMatch));
                 })
                 .sorted(Comparator.comparing(Message::getTimeStamp))
                 .collect(Collectors.toList());

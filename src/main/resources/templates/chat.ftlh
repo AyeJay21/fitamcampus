@@ -34,8 +34,6 @@
 </div>
 
 <script>
-
-
 function followerUrlToReceiver(url) {
     if (typeof url === 'string' && url.includes('@')) {
         const [name, domain] = url.split('@');
