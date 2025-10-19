@@ -127,6 +127,10 @@
     <div class="chatContainer">
         <h3 id="chatTitle">Wähle einen Kontakt</h3>
         <div id="messageList" class="no-chat">Keine Nachrichten</div>
+        <form id="chatForm" style="display:none; margin-top:1rem; display:flex; gap:0.5rem;">
+            <input id="chatInput" type="text" placeholder="Nachricht schreiben..." autocomplete="off" style="flex:1; padding:0.7rem 1rem; border-radius:12px; border:1px solid #cbe7ff; font-size:1rem;" />
+            <button id="sendBtn" type="submit" style="padding:0.7rem 1.2rem; border-radius:12px; background:#4fa3ff; color:#fff; border:none; font-size:1rem; cursor:pointer;">Senden</button>
+        </form>
     </div>
 </div>
 
@@ -178,8 +182,29 @@ function loadFollowers(username) {
 }
 
 function loadMessages(username, receiverUrl, displayName) {
-    chatTitle.textContent = `Chat mit displayName` + displayName;
+    chatTitle.textContent = 'Chat mit ' + displayName;
     messageList.textContent = 'Lade Nachrichten...';
+    // Zeige das Eingabefeld an
+    const chatForm = document.getElementById('chatForm');
+    chatForm.style.display = 'flex';
+    chatForm.onsubmit = function(e) {
+        e.preventDefault();
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
+        // Nachricht absenden
+        fetch(`/users/${username}/chats`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ receiver: receiverUrl, text: text })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Fehler beim Senden');
+            input.value = '';
+            loadMessages(username, receiverUrl, displayName);
+        })
+        .catch(() => alert('Fehler beim Senden der Nachricht.'));
+    };
     fetch(`/users/${username}/chats?receiver=` + encodeURIComponent(receiverUrl))
         .then(res => res.json())
         .then(msgs => {
