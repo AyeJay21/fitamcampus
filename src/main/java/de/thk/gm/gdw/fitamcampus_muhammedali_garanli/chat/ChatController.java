@@ -54,5 +54,4 @@ public class ChatController {
         model.addAttribute("chatMessages", chatMessages);
         return "chat";
     }
-
 }

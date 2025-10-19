@@ -24,7 +24,7 @@
 <div class="mainContainer">
     <div class="follower">
         <h3 class="username">${username}</h3>
-        <div id="followerList" onclick="window.location.href='/users/{username}/chats'">Lade Follower...</div>
+        <div id="followerList" onclick="window.location.href='/users/${username}/chats'">Lade Follower...</div>
     </div>
 
 </div>
@@ -50,42 +50,16 @@
                 p.textContent = follower.followerUrl;
                 p.classList.add('follower');
                 p.addEventListener("click", () => {
-                    const body = {follower: follower.followerUrl}
-
-                    fetch(`/users/${username}/chats`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(body)
-                    })
-                        .then(res => {
-                            if (!res.ok) throw new Error("Fehler beim Senden");
-                            return res.json();
-                        })
-                        .then(data => {
-                            console.log("Antwort vom Server:", data);
-                            // Optional: z. B. Chat anzeigen oder Seite wechseln
-                            // window.location.href = `/users/${username}/chats`;
-                        })
-                        .catch(err => {
-                            console.error("Fehler:", err);
-                        });
-
-                })
+                    // Redirect to the chat page with the followerUrl as query parameter 'receiver'
+                    const targetUrl = `/users/${username}/chats?receiver=${follower.followerUrl}`;
+                    window.location.href = targetUrl;
+                });
                 listDiv.appendChild(p);
             });
         })
         .catch(err => {
             listDiv.textContent = "Fehler: " + err.message;
         });
-
-    fetch(`/users/${username}/chats`)
-        .then(res => {
-            if (!res.ok) throw new Error("Fehler beim Laden");
-            return res.json();
-        })
-        .then(chat => chat)
 </script>
 </body>
 </html>
