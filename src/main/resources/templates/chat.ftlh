@@ -200,7 +200,7 @@ function loadMessages(username, receiverUrl, displayName) {
                 // Message-Bubble: eigene Nachrichten rechts, andere links
                 let isOwn = (msg.sender == username);
                 div.className = 'message' + (isOwn ? ' own' : '');
-                div.innerHTML = `<b>${isOwn ? 'Du' : msg.sender}:</b> ${msg.text} <small>${formatted}</small>`;
+                div.innerHTML = '<b>' + (isOwn ? 'Du' : msg.sender) + ':</b> ' + msg.text + ' <small>' + formatted + '</small>';
                 messageList.appendChild(div);
             });
         })
