@@ -21,41 +21,20 @@
 <body>
 <h1>Chat</h1>
 
+
 <div class="mainContainer">
     <div class="followerContainer">
-    <h3 class="username" id="currentUser"></h3>
-    <div id="followerList">Lade Follower...</div>
+        <h3 class="username" id="currentUser"></h3>
+        <div id="followerList">Lade Follower...</div>
     </div>
-
+    <div class="chatContainer">
+        <h3 id="chatTitle">Wähle einen Kontakt</h3>
+        <div id="messageList" class="no-chat">Keine Nachrichten</div>
+    </div>
 </div>
 
 <script>
-    // Username wird dynamisch aus dem DOM gelesen
-    const listDiv = document.getElementById("followerList");
 
-    fetch(`/users/${username}/followers`)
-        .then(res => {
-            if (!res.ok) throw new Error("Fehler beim Laden der Follower");
-            return res.json();
-        })
-        .then(followers => {
-
-            if (followers.length === 0) {
-                listDiv.textContent = "Keine Follower gefunden.";
-                return;
-            }
-            followers.forEach(follower => {
-                const p = document.createElement("p");
-
-                p.textContent = follower.followerUrl;
-                p.dataset.followerUrl = follower.followerUrl;
-                p.classList.add('follower');
-                listDiv.appendChild(p);
-            });
-        })
-        .catch(err => {
-            listDiv.textContent = "Fehler: " + err.message;
-        });
 
 function followerUrlToReceiver(url) {
     if (typeof url === 'string' && url.includes('@')) {
