@@ -104,7 +104,7 @@ function loadFollowers(username) {
 }
 
 function loadMessages(username, receiverUrl, displayName) {
-    chatTitle.textContent = `Chat mit ${displayName}`;
+    chatTitle.textContent = `Chat mit displayName` + displayName;
     messageList.textContent = 'Lade Nachrichten...';
     fetch(`/users/${username}/chats?receiver=${encodeURIComponent(receiverUrl)}`)
         .then(res => res.json())
@@ -117,7 +117,8 @@ function loadMessages(username, receiverUrl, displayName) {
             msgs.forEach(msg => {
                 let div = document.createElement('div');
                 div.className = 'message';
-                div.innerHTML = "<b>" + (msg.sender == username ? "Du" : msg.sender) + ":</b> " + msg.text + " <br><small>" + msg.timeStamp + "</small>";                messageList.appendChild(div);
+                div.innerHTML = "<b>" + (msg.sender == username ? "Du" : msg.sender) + ":</b> " + msg.text + " <br><small>" + msg.timeStamp + "</small>";
+                messageList.appendChild(div);
             });
         })
         .catch(() => {
