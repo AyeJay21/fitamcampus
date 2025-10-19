@@ -23,7 +23,7 @@
 
 <div class="mainContainer">
     <div class="followerContainer">
-        <h3 class="username" id="currentUser"></h3>
+        <h3 class="username" id="currentUser">Laden...</h3>
         <div id="followerList">Lade Follower...</div>
     </div>
 
@@ -34,52 +34,61 @@
 </div>
 
 <script>
-    const username = document.body.dataset.username || "testuser";
-    let selectedReceiver = null;
+    // Username aus URL extrahieren: /users/{username}/chats
+    const pathParts = window.location.pathname.split('/');
+    const username = pathParts[2];
+
+    console.log("Current username:", username);
 
     document.getElementById("currentUser").textContent = username;
 
     // Follower laden
-    fetch(`/users/${username}/followers`)
-        .then(res => res.json())
-        .then(followers => {
-            const listDiv = document.getElementById("followerList");
-            listDiv.innerHTML = "";
+    function loadFollowers() {
+        fetch(`/users/${username}/followers`)
+            .then(res => res.json())
+            .then(followers => {
+                console.log("Followers:", followers);
+                const listDiv = document.getElementById("followerList");
+                listDiv.innerHTML = "";
 
-            if (followers.length === 0) {
-                listDiv.textContent = "Keine Follower gefunden.";
-                return;
-            }
+                if (!followers || followers.length === 0) {
+                    listDiv.textContent = "Keine Follower gefunden.";
+                    return;
+                }
 
-            followers.forEach(follower => {
-                const p = document.createElement("p");
-                p.textContent = follower.followerUrl;
-                p.classList.add('follower');
+                followers.forEach(follower => {
+                    const p = document.createElement("p");
+                    p.textContent = follower.followerUrl;
+                    p.classList.add('follower');
 
-                p.addEventListener("click", function() {
-                    document.querySelectorAll(".follower").forEach(el => el.classList.remove("active"));
-                    this.classList.add("active");
-                    loadChat(username, follower.followerUrl);
+                    p.onclick = function() {
+                        document.querySelectorAll(".follower").forEach(el => el.classList.remove("active"));
+                        this.classList.add("active");
+                        loadChat(username, follower.followerUrl);
+                    };
+
+                    listDiv.appendChild(p);
                 });
-
-                listDiv.appendChild(p);
+            })
+            .catch(err => {
+                console.error("Fehler beim Laden der Follower:", err);
+                document.getElementById("followerList").textContent = "Fehler beim Laden: " + err.message;
             });
-        })
-        .catch(err => {
-            console.error("Fehler beim Laden der Follower:", err);
-        });
+    }
 
     // Chat-Nachrichten laden
     function loadChat(sender, receiver) {
-        document.getElementById("chatTitle").textContent = `Chat mit ${receiver}`;
+        console.log("Loading chat between", sender, "and", receiver);
+        document.getElementById("chatTitle").textContent = "Chat mit " + receiver;
 
         fetch(`/users/${sender}/chats?receiver=${encodeURIComponent(receiver)}`)
             .then(res => res.json())
             .then(messages => {
+                console.log("Messages:", messages);
                 const messageList = document.getElementById("messageList");
                 messageList.innerHTML = "";
 
-                if (messages.length === 0) {
+                if (!messages || messages.length === 0) {
                     messageList.className = "no-chat";
                     messageList.textContent = "Keine Nachrichten mit diesem Kontakt";
                     return;
@@ -92,22 +101,21 @@
                     msgDiv.classList.add(msg.sender === username ? "sent" : "received");
 
                     const date = new Date(msg.timeStamp).toLocaleString('de-DE');
-                    msgDiv.innerHTML = `
-                            <div class="message-sender">\${msg.sender}</div>
-                            <div>\${msg.text}</div>
-                            <div class="message-time">\${date}</div>
-                        `;
+                    msgDiv.innerHTML = msg.sender + ": " + msg.text + " (" + date + ")";
 
                     messageList.appendChild(msgDiv);
                 });
 
-                // Scroll zum Ende
                 messageList.scrollTop = messageList.scrollHeight;
             })
             .catch(err => {
                 console.error("Fehler beim Laden des Chats:", err);
+                document.getElementById("messageList").textContent = "Fehler: " + err.message;
             });
     }
+
+    // Follower beim Laden fetchen
+    loadFollowers();
 </script>
 </body>
 </html>
