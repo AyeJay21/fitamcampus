@@ -22,7 +22,7 @@
 <h1>Chat</h1>
 
 <div class="mainContainer">
-    <div class="follower">
+    <div class="followerContainer">
         <h3 class="username">${username}</h3>
     <div id="followerList">Lade Follower...</div>
     </div>
@@ -48,6 +48,7 @@
                 const p = document.createElement("p");
 
                 p.textContent = follower.followerUrl;
+                p.dataset.followerUrl = follower.followerUrl;
                 p.classList.add('follower');
                 listDiv.appendChild(p);
             });
@@ -60,7 +61,8 @@
     const pElements = document.querySelectorAll(".follower");
     pElements.forEach(p => {
         p.addEventListener("click", () => {
-            console.log("geklickt:", p.textContent);
+            const url = e.currentTarget.dataset.followerUrl;
+            console.log('geklickt:', url);
         });
     });
 </script>
