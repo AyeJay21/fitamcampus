@@ -5,17 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat</title>
     <style>
-        body {
-            margin: 0;
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: #f4f6fb;
+    }
+
+    .mainContainer {
+        display: flex;
+        flex-direction: row;
+        gap: 2rem;
+        max-width: 900px;
+        margin: 2rem auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        padding: 2rem;
+    }
+
+    .followerContainer {
+        min-width: 220px;
+        border-right: 1px solid #e0e4ea;
+        padding-right: 1rem;
+    }
+    .followerContainer h3 {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        color: #3a3a3a;
+    }
+    #followerList {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    #followerList p {
+        margin: 0;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        background: #e9eef7;
+        color: #2a2a2a;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    #followerList p:hover {
+        background: #d0d8e8;
+    }
+
+    .chatContainer {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+    #chatTitle {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        color: #3a3a3a;
+    }
+    #messageList {
+        flex: 1;
+        overflow-y: auto;
+        background: #f7f9fc;
+        border-radius: 12px;
+        padding: 1rem;
+        min-height: 300px;
+        max-height: 400px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .message {
+        max-width: 70%;
+        padding: 0.7rem 1rem;
+        border-radius: 16px;
+        background: #e9eef7;
+        color: #222;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        word-break: break-word;
+        position: relative;
+        align-self: flex-start;
+        margin-bottom: 0.2rem;
+        font-size: 1rem;
+        animation: fadeIn 0.3s;
+    }
+    .message.own {
+        background: #cbe7ff;
+        align-self: flex-end;
+    }
+    .message small {
+        display: block;
+        color: #888;
+        font-size: 0.85em;
+        margin-top: 0.3em;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 700px) {
+        .mainContainer {
+            flex-direction: column;
             padding: 1rem;
-            font-family: sans-serif;
         }
-
-        .follower p {
-            margin: 0.25rem 0;
+        .chatContainer {
+            margin-top: 1rem;
         }
-
-
+    }
     </style>
 </head>
 <body>
@@ -93,8 +190,17 @@ function loadMessages(username, receiverUrl, displayName) {
             messageList.innerHTML = '';
             msgs.forEach(msg => {
                 let div = document.createElement('div');
-                div.className = 'message';
-                div.innerHTML = "<b>" + (msg.sender == username ? "Du" : msg.sender) + ":</b> " + msg.text + " <br><small>" + msg.timeStamp + "</small>";
+                // Zeit formatieren: z.B. 19.10.2025 12:44
+                let date = new Date(msg.timeStamp);
+                let formatted = date.getDate().toString().padStart(2, '0') + '.' +
+                    (date.getMonth()+1).toString().padStart(2, '0') + '.' +
+                    date.getFullYear() + ' ' +
+                    date.getHours().toString().padStart(2, '0') + ':' +
+                    date.getMinutes().toString().padStart(2, '0');
+                // Message-Bubble: eigene Nachrichten rechts, andere links
+                let isOwn = (msg.sender == username);
+                div.className = 'message' + (isOwn ? ' own' : '');
+                div.innerHTML = `<b>${isOwn ? 'Du' : msg.sender}:</b> ${msg.text} <small>${formatted}</small>`;
                 messageList.appendChild(div);
             });
         })
