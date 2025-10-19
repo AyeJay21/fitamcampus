@@ -43,13 +43,45 @@ public class ChatController {
         model.addAttribute("username", username);
         List<Message> allMessages = messageRepository.findAll();
 
+        // Hilfsfunktion: name@domain zu https://domain/users/name
+        java.util.function.Function<String, String> toUrl = (str) -> {
+            if (str != null && str.contains("@")) {
+                String[] parts = str.split("@");
+                if (parts.length == 2) {
+                    return "https://" + parts[1] + "/users/" + parts[0];
+                }
+            }
+            return str;
+        };
+
         List<Message> chatMessages = Collections.emptyList();
         if (receiver != null && !receiver.isBlank()) {
+            String receiverUrl = receiver;
+            final String receiverShort;
+            // Falls receiver eine URL ist, baue name@domain
+            if (receiverUrl.startsWith("https://") && receiverUrl.contains("/users/")) {
+                String[] urlParts = receiverUrl.split("/users/");
+                if (urlParts.length == 2) {
+                    receiverShort = urlParts[1] + "@" + urlParts[0].replace("https://", "").replace("/", "");
+                } else {
+                    receiverShort = null;
+                }
+            } else {
+                receiverShort = null;
+            }
+
             chatMessages = allMessages.stream()
-                    .filter(m -> (m.getSender().equals(username) && m.getReciever().equals(receiver)) ||
-                            (m.getSender().equals(receiver) && m.getReciever().equals(username)))
-                    .sorted(Comparator.comparing(Message::getTimeStamp))
-                    .collect(Collectors.toList());
+                .filter(m -> {
+                    String senderUrl = toUrl.apply(m.getSender());
+                    String recieverUrl = toUrl.apply(m.getReciever());
+                    // Vergleiche sowohl als URL als auch als name@domain
+                    return ((senderUrl.equals(toUrl.apply(username)) && recieverUrl.equals(receiverUrl)) ||
+                            (senderUrl.equals(receiverUrl) && recieverUrl.equals(toUrl.apply(username))) ||
+                            (receiverShort != null && m.getSender().equals(username) && m.getReciever().equals(receiverShort)) ||
+                            (receiverShort != null && m.getSender().equals(receiverShort) && m.getReciever().equals(username)));
+                })
+                .sorted(Comparator.comparing(Message::getTimeStamp))
+                .collect(Collectors.toList());
         }
         for (Message message: chatMessages) {
             System.out.println(message.getText());
