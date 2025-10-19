@@ -192,11 +192,15 @@ function loadMessages(username, receiverUrl, displayName) {
         const input = document.getElementById('chatInput');
         const text = input.value.trim();
         if (!text) return;
-        // Nachricht absenden
-        fetch(`/users/${username}/chats`, {
+        // Nachricht absenden an ActivityPub-Endpoint
+        fetch('/activitypub/send-note', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ receiver: receiverUrl, text: text })
+            body: JSON.stringify({
+                fromUser: username,
+                targetHandle: receiverUrl,
+                message: text
+            })
         })
         .then(res => {
             if (!res.ok) throw new Error('Fehler beim Senden');
