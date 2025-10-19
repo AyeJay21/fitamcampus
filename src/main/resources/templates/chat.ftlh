@@ -49,11 +49,11 @@
 
                 p.textContent = follower.followerUrl;
                 p.classList.add('follower');
-                p.addEventListener("click", () => {
-                    // Redirect to the chat page with the followerUrl as query parameter 'receiver'
-                    const targetUrl = `/users/${username}/chats?receiver=${follower.followerUrl}`;
-                    window.location.href = targetUrl;
-                });
+                <#--p.addEventListener("click", () => {-->
+                <#--    // Redirect to the chat page with the followerUrl as query parameter 'receiver'-->
+                <#--    const targetUrl = `/users/${username}/chats?receiver=${follower.followerUrl}`;-->
+                <#--    window.location.href = targetUrl;-->
+                <#--});-->
                 listDiv.appendChild(p);
             });
         })
