@@ -44,7 +44,6 @@ public class FollowerController {
         followerRepository.save(follower);
 
         try {
-            // Lokalen Actor holen
             var me = actorService.getActorByUsername(username);
             String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
             String privateKey = me.getPrivateKeyPem();
@@ -52,7 +51,6 @@ public class FollowerController {
             String targetInbox;
             String targetActorUrl;
             if (followerUrl.startsWith("http://") || followerUrl.startsWith("https://")) {
-                // FollowerUrl ist eine vollständige URL, hole Actor JSON direkt
                 WebClient client = WebClient.create(followerUrl);
                 String actorJson = client.get()
                         .header("Accept", "application/activity+json")
