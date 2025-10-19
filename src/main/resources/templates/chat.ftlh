@@ -54,14 +54,12 @@
             followers.forEach(follower => {
                 const p = document.createElement("p");
                 p.textContent = follower.followerUrl;
-                p.dataset.followerUrl = follower.followerUrl;
                 p.classList.add('follower');
 
-                p.addEventListener("click", () => {
+                p.addEventListener("click", function() {
                     document.querySelectorAll(".follower").forEach(el => el.classList.remove("active"));
-                    p.classList.add("active");
-                    selectedReceiver = follower.followerUrl;
-                    loadChat(username, selectedReceiver);
+                    this.classList.add("active");
+                    loadChat(username, follower.followerUrl);
                 });
 
                 listDiv.appendChild(p);
