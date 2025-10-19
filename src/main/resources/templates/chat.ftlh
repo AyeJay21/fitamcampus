@@ -70,7 +70,8 @@
         .catch(err => {
             console.error("Fehler beim Laden der Follower:", err);
         });
-    
+
+    // Chat-Nachrichten laden
     function loadChat(sender, receiver) {
         document.getElementById("chatTitle").textContent = `Chat mit ${receiver}`;
 
@@ -92,10 +93,11 @@
                     msgDiv.classList.add("message");
                     msgDiv.classList.add(msg.sender === username ? "sent" : "received");
 
+                    const date = new Date(msg.timeStamp).toLocaleString('de-DE');
                     msgDiv.innerHTML = `
-                            <div class="message-sender">${msg.sender}</div>
-                            <div>${msg.text}</div>
-                            <div class="message-time">${new Date(msg.timeStamp).toLocaleString('de-DE')}</div>
+                            <div class="message-sender">\${msg.sender}</div>
+                            <div>\${msg.text}</div>
+                            <div class="message-time">\${date}</div>
                         `;
 
                     messageList.appendChild(msgDiv);
