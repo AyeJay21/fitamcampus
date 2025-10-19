@@ -8,10 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -38,8 +35,10 @@ public class ChatController {
 
     @GetMapping("/users/{username}/chats")
     public String getChat(@PathVariable String username,
-                          @RequestParam String receiver,
+                          @RequestParam(required = false) String receiver,
                           Model model) {
+        // expose username for client-side JS/templates
+        model.addAttribute("username", username);
         List<Message> allMessages = messageRepository.findAll();
 
         List<Message> chatMessages = Collections.emptyList();
@@ -52,7 +51,7 @@ public class ChatController {
         }
         for (Message message: chatMessages) {
             System.out.println(message.getText());
-        };
+        }
         model.addAttribute("chatMessages", chatMessages);
         return "chat";
     }
