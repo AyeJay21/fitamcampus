@@ -237,7 +237,9 @@
                     input.value = '';
                     loadMessages(username, receiverUrl, displayName);
                 })
-                .catch(() => alert('Fehler beim Senden der Nachricht.'));
+                .catch(function (e) {
+                    alert('Fehler beim Senden der Nachricht: ' + e);
+                });
         };
         fetch(`/users/${username}/chats?receiver=` + encodeURIComponent(receiverUrl))
             .then(res => res.json())
