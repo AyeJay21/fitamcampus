@@ -233,7 +233,9 @@
                 body: JSON.stringify({sendNoteRequest})
             })
                 .then(res => {
-                    if (!res.ok) throw new Error('Fehler beim Senden');
+                    if (!res.ok) {
+                        return res.text().then(msg => { throw new Error(msg); });
+                    }
                     input.value = '';
                     loadMessages(username, receiverUrl, displayName);
                 })
