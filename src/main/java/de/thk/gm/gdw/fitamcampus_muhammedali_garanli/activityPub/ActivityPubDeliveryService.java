@@ -21,12 +21,10 @@ public class ActivityPubDeliveryService {
         String host = url.getHost();
         String path = url.getPath();
 
-        // Sicherstellen, dass path nicht leer ist
         if (path == null || path.isEmpty()) {
             path = "/";
         }
 
-        // Verwende den HttpSignatureService für konsistente Header
         HttpSignatureService.SignatureResult signatureResult = httpSignatureService.sign("POST", path, host, body, privateKeyPem, actorId);
 
         System.out.println("=================== ACTIVITYPUB DEBUG ===================");
