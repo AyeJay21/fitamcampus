@@ -230,7 +230,7 @@
             fetch('/activitypub/send-note', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({sendNoteRequest})
+                body: JSON.stringify(sendNoteRequest)
             })
                 .then(res => {
                     if (!res.ok) {
