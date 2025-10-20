@@ -165,6 +165,14 @@
         return url;
     }
 
+    function urlToHandle(url) {
+        if (url.startsWith('https://') && url.includes('/users/')) {
+            const [domain, name] = url.replace('https://', '').split('/users/');
+            return name + '@' + domain.replace('/', '');
+        }
+        return url;
+    }
+
     const currentUser = document.getElementById('currentUser');
     const followerList = document.getElementById('followerList');
     const chatTitle = document.getElementById('chatTitle');
@@ -215,7 +223,7 @@
             if (!text) return;
             const sendNoteRequest = {
                 fromUser: username,
-                targetHandle: receiverUrl,
+                targetHandle: urlToHandle(receiverUrl),
                 message: text
             };
             console.log("FrontEnd fromUser: " + sendNoteRequest.fromUser + " targetHandle: " + sendNoteRequest.targetHandle + " message: " + sendNoteRequest.message)
