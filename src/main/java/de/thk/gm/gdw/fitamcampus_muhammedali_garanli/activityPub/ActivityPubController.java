@@ -108,7 +108,7 @@ public class ActivityPubController {
             outboxItem.setActivity(createActivity);
             outboxRepository.save(outboxItem);
 
-
+            System.out.println("BackendEnd fromUser: " + fromUser + " targetHandle: " + targetHandle + " message: " + message);
             messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
 
             return ResponseEntity.ok(Map.of(

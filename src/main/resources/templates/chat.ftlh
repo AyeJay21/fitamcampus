@@ -218,6 +218,7 @@
                 targetHandle: receiverUrl,
                 message: text
             };
+            console.log("FrontEnd fromUser: " + sendNoteRequest.fromUser + " targetHandle: " + sendNoteRequest.targetHandle + " message: " + sendNoteRequest.message)
             fetch('/activitypub/send-note', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -247,7 +248,6 @@
                         date.getFullYear() + ' ' +
                         date.getHours().toString().padStart(2, '0') + ':' +
                         date.getMinutes().toString().padStart(2, '0');
-                    // Message-Bubble: eigene Nachrichten rechts, andere links
                     let isOwn = (msg.sender == username);
                     div.className = 'message' + (isOwn ? ' own' : '');
                     div.innerHTML = '<b>' + (isOwn ? 'Du' : msg.sender) + ':</b> ' + msg.text + ' <small>' + formatted + '</small>';
@@ -259,6 +259,5 @@
             });
     }
 </script>
-
 </body>
 </html>
