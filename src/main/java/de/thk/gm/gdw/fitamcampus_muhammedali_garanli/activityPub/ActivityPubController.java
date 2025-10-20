@@ -71,9 +71,11 @@ public class ActivityPubController {
             String message = request.getMessage();
             String targetHandle = request.getTargetHandle();
             List<UUID> meetingIds = request.getMeetingIds();
-            
+
+            System.out.println("FROMUSER: " + fromUser);
             Actor me = actorService.getActorByUsername(fromUser);
             String privateKey = me.getPrivateKeyPem();
+            System.out.println("ME: " + me);
             String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
 
             String targetInbox = remoteActorService.resolveActorInbox(targetHandle);
