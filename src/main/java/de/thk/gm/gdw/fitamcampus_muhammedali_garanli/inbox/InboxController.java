@@ -95,7 +95,7 @@ public class InboxController {
                 } else if (toObj instanceof String s) {
                     receiver = s;
                 }
-                followerService.saveOutsideFollowRequest(username, receiver);
+                followerService.saveOutsideFollowRequest(username, receiver, type);
             }
         }
 

@@ -64,6 +64,7 @@
         margin-right: 8px;
     }
 </style>
+
 <div class="mainContainer">
     <form action="/meetings" method="post">
         <label for="nameId">Name:</label>
@@ -100,5 +101,9 @@
         <input type="submit" value="Submit">
     </form>
 </div>
+<div style="position:fixed;bottom:10px;right:10px;z-index:9999;">
+    <a href="/followerRequest/${currentUser.username}" style="background:#4fa3ff;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:bold;box-shadow:0 2px 8px rgba(0,0,0,0.1);">Follower-Anfragen</a>
+</div>
+
 </body>
 </html>

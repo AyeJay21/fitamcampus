@@ -67,7 +67,6 @@ public class FollowerController {
                 }
                 targetActorUrl = followerUrl;
             } else {
-                // Handle wie bisher
                 targetInbox = remoteActorService.resolveActorInbox(followerUrl);
                 targetActorUrl = remoteActorService.resolveActorUrl(followerUrl);
             }

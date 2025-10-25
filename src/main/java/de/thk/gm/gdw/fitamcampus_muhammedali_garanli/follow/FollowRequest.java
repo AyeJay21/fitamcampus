@@ -20,4 +20,11 @@ public class FollowRequest {
     public String getFollowerUrl() { return followerUrl; }
     public void setFollowerUrl(String followerUrl) { this.followerUrl = followerUrl; }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

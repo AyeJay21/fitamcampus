@@ -168,6 +168,8 @@ public class ActivityPubController {
             outboxItem.setActivity(createActivity);
             outboxRepository.save(outboxItem);
 
+            messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
+
             return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Direct message sent to " + targetHandle,
