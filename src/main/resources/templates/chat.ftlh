@@ -229,7 +229,10 @@
             console.log("FrontEnd fromUser: " + sendNoteRequest.fromUser + " targetHandle: " + sendNoteRequest.targetHandle + " message: " + sendNoteRequest.message)
             fetch('/activitypub/send-note', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/activity+json, application/ld+json'
+                },
                 body: JSON.stringify(sendNoteRequest)
             })
                 .then(res => {

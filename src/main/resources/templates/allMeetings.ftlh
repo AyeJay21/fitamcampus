@@ -426,7 +426,8 @@
             fetch("/activitypub/send-note", {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/activity+json, application/ld+json'
                 },
                 body: JSON.stringify(requestData)
             })
