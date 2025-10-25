@@ -95,7 +95,6 @@ const username = (document.getElementById('currentUser') && document.getElementB
 
 const userForRequest = username;
 
-
 function loadFollowRequests() {
 	console.log("UserForRequest " + userForRequest)
 	incomingDiv.innerHTML = 'Lade Anfragen...';
@@ -110,7 +109,7 @@ function loadFollowRequests() {
 			requests.forEach(req => {
 				const div = document.createElement('div');
 				div.className = 'request-item';
-				div.innerHTML = `<span>${req.user || req.username || req.actor || req.followerUrl || JSON.stringify(req)}</span>`;
+				div.innerHTML = `<span>` + req.username + `</span><span>` + req.followerUrl + `</span>`;
 				incomingDiv.appendChild(div);
 			});
 		})
