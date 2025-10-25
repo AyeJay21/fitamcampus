@@ -1,6 +1,8 @@
 package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.inbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.follow.FollowerRepository;
+import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.follow.FollowerService;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message.Message;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +16,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import static io.netty.util.internal.SystemPropertyUtil.contains;
+
 @Controller
 @RequestMapping("/users/{username}/inbox")
 public class InboxController {
 
     public final InboxRepository inboxRepository;
 
-    public InboxController(InboxRepository inboxRepository) {
+    public InboxController(InboxRepository inboxRepository,
+                           FollowerRepository followerRepository) {
         this.inboxRepository = inboxRepository;
+        this.followerRepository = followerRepository;
     }
+
+    public FollowerService followerService;
 
     @Autowired
     public MessageService messageService;
+    private final FollowerRepository followerRepository;
 
     @GetMapping(produces = "application/json")
     @ResponseBody
@@ -33,7 +42,7 @@ public class InboxController {
         return inboxRepository.findByUsername(username);
     }
 
-    @PostMapping(consumes = {"application/json", "application/activity+json"})
+    @PostMapping(consumes = {"application/json", "application/activity+json","application/ld+json"})
     @ResponseBody
     public Map<String, Object> addToInbox(@PathVariable String username, @RequestBody Map<String, Object> activity) throws Exception {
         System.out.println("Empfangene Activity: " + activity);
@@ -76,6 +85,17 @@ public class InboxController {
                 }
 
                 messageService.saveMessage(sender, receiver, text, date);
+            }
+            if ("Follow".equals(type)) {
+                String receiver = null;
+
+                Object toObj = objectMap.get("to");
+                if (toObj instanceof List<?> toList && !toList.isEmpty()) {
+                    receiver = toList.get(0).toString();
+                } else if (toObj instanceof String s) {
+                    receiver = s;
+                }
+                followerService.saveOutsideFollowRequest(username, receiver);
             }
         }
 

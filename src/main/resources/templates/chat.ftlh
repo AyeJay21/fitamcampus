@@ -234,7 +234,9 @@
             })
                 .then(res => {
                     if (!res.ok) {
-                        return res.text().then(msg => { throw new Error(msg); });
+                        return res.text().then(msg => {
+                            throw new Error(msg);
+                        });
                     }
                     input.value = '';
                     loadMessages(username, receiverUrl, displayName);
@@ -253,7 +255,6 @@
                 messageList.innerHTML = '';
                 msgs.forEach(msg => {
                     let div = document.createElement('div');
-                    // Zeit formatieren: z.B. 19.10.2025 12:44
                     let date = new Date(msg.timeStamp);
                     let formatted = date.getDate().toString().padStart(2, '0') + '.' +
                         (date.getMonth() + 1).toString().padStart(2, '0') + '.' +

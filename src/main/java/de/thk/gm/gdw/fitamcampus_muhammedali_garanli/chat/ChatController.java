@@ -44,7 +44,6 @@ public class ChatController {
         model.addAttribute("username", username);
         List<Message> allMessages = messageRepository.findAll();
 
-        // Hilfsfunktion: name@domain zu https://domain/users/name
         Function<String, String> toUrl = (str) -> {
             if (str != null && str.contains("@")) {
                 String[] parts = str.split("@");
@@ -79,7 +78,6 @@ public class ChatController {
                 .filter(m -> {
                     String senderUrl = toUrl.apply(m.getSender());
                     String recieverUrl = toUrl.apply(m.getReciever());
-                    // Vergleiche alle Varianten: plain, URL, name@domain
                     boolean isOwnSender = m.getSender().equals(username) || senderUrl.equals(usernameUrl) || (usernameShort != null && m.getSender().equals(usernameShort));
                     boolean isOwnReceiver = m.getReciever().equals(username) || recieverUrl.equals(usernameUrl) || (usernameShort != null && m.getReciever().equals(usernameShort));
                     boolean isReceiverMatch = m.getSender().equals(receiver) || senderUrl.equals(receiverUrl) || (receiverShort != null && m.getSender().equals(receiverShort));

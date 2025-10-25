@@ -146,7 +146,7 @@ public class ActivityPubController {
             note.put("id", actorId + "/notes/" + java.util.UUID.randomUUID());
             note.put("content", message);
             note.put("attributedTo", actorId);
-            note.put("to", Arrays.asList(targetActorUrl)); // NUR der Empfänger - privat
+            note.put("to", Arrays.asList(targetActorUrl));
             // Erwähnung hinzufügen für bessere Sichtbarkeit
             note.put("tag", Arrays.asList(Map.of(
                 "type", "Mention",
