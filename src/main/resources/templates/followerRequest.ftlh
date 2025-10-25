@@ -107,6 +107,7 @@ function loadFollowRequests() {
 			}
 			incomingDiv.innerHTML = '';
 			requests.forEach(req => {
+				console.log("REQ.USERNAME " + req.username + " req.followerUrl " + req.followerUrl)
 				const div = document.createElement('div');
 				div.className = 'request-item';
 				div.innerHTML = `<span>` + req.username + `</span><span>` + req.followerUrl + `</span>`;

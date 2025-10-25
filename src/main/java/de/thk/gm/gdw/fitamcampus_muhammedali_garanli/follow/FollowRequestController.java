@@ -16,7 +16,7 @@ public class FollowRequestController {
     FollowerService followerService;
 
     @GetMapping("/users/{username}/followRequests")
-    public List<?> getFollowRequest(@RequestBody String username){
+    public List<?> getFollowRequest(@PathVariable String username){
         return followerService.getFollowerRequest(username);
     }
 
