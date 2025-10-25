@@ -423,7 +423,7 @@
                 fromUser: "${currentUser.username}",
             };
             console.log("Sending data" + requestData);
-            fetch("/activitypub/send-note", {
+            fetch("/activitypub/send-private-message", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

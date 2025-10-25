@@ -227,7 +227,7 @@
                 message: text
             };
             console.log("FrontEnd fromUser: " + sendNoteRequest.fromUser + " targetHandle: " + sendNoteRequest.targetHandle + " message: " + sendNoteRequest.message)
-            fetch('/activitypub/send-note', {
+            fetch('/activitypub/send-private-message', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
