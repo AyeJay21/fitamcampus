@@ -96,15 +96,16 @@ const username = (document.getElementById('currentUser') && document.getElementB
 const userForRequest = username;
 
 function loadFollowRequests() {
-	console.log("UserForRequest " + userForRequest)
 	incomingDiv.innerHTML = 'Lade Anfragen...';
 	fetch(`/users/`+  userForRequest + `/followRequests`)
 		.then(res => res.json())
 		.then(requests => {
+			console.log("UserForRequest " + userForRequest)
 			if (!Array.isArray(requests) || requests.length === 0) {
 				incomingDiv.innerHTML = '<em>Keine offenen Anfragen.</em>';
 				return;
 			}
+			console.log("UserForRequest " + userForRequest)
 			incomingDiv.innerHTML = '';
 			requests.forEach(req => {
 				console.log("REQ.USERNAME " + req.username + " req.followerUrl " + req.followerUrl)
