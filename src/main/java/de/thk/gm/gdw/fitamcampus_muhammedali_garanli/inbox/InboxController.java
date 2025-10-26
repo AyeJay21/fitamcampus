@@ -30,10 +30,12 @@ public class InboxController {
         this.followerRepository = followerRepository;
     }
 
-    public FollowerService followerService;
+    @Autowired
+    private FollowerService followerService;
 
     @Autowired
     public MessageService messageService;
+
     private final FollowerRepository followerRepository;
 
     @GetMapping(produces = "application/json")
