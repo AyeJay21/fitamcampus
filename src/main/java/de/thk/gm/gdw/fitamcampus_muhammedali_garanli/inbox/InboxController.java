@@ -93,11 +93,11 @@ public class InboxController {
                 System.out.println("=======================================6");
             }
             System.out.println("========================================7");
-            if ("Follow".equals(type)) {
-                String followerUrl = (String) activity.get("actor");
-                System.out.println("================= FOLLOWER URL=======================: " + followerUrl);
-                followerService.saveOutsideFollowRequest(username, followerUrl, type);
-            }
+        }
+        if ("Follow".equals(type)) {
+            String followerUrl = (String) activity.get("actor");
+            System.out.println("================= FOLLOWER URL=======================: " + followerUrl);
+            followerService.saveOutsideFollowRequest(username, followerUrl, type);
         }
 
         Inbox saved = inboxRepository.save(inbox);
