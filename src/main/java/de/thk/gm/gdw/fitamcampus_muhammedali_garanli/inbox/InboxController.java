@@ -61,9 +61,7 @@ public class InboxController {
         inbox.setActor((String) activity.get("actor"));
 
         inbox.setObjectData(activity.get("object").toString());
-        System.out.println("========================================1");
         if (activity.get("object") instanceof Map<?, ?> objectMap) {
-            System.out.println("=======================================2");
             inbox.setObjectData(mapper.writeValueAsString(objectMap));
             inbox.setObjectType((String) objectMap.get("type"));
             inbox.setContent((String) objectMap.get("content"));
@@ -71,9 +69,7 @@ public class InboxController {
             inbox.setPublished((String) objectMap.get("published"));
             inbox.setTo((objectMap.get("to") != null) ? objectMap.get("to").toString() : null);
 
-            System.out.println("=======================================3");
             if ("Create".equals(type) && "Note".equals(objectMap.get("type"))) {
-                System.out.println("=======================================4");
                 String sender = (String) activity.get("actor");
                 String receiver = null;
 
@@ -90,15 +86,11 @@ public class InboxController {
                     date = Date.from(Instant.parse(objectMap.get("published").toString()));
                 }
 
-                System.out.println("========================================5");
                 messageService.saveMessage(sender, receiver, text, date);
-                System.out.println("=======================================6");
             }
-            System.out.println("========================================7");
         }
         if ("Follow".equals(type)) {
             String followerUrl = (String) activity.get("actor");
-            System.out.println("================= FOLLOWER URL=======================: " + followerUrl);
             followerService.saveOutsideFollowRequest(username, followerUrl, type);
         }
 

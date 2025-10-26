@@ -100,13 +100,13 @@ function loadFollowRequests() {
 	fetch(`/users/`+  userForRequest + `/followRequests`)
 		.then(res => res.json())
 		.then(requests => {
-			console.log("UserForRequest " + userForRequest)
+			console.log("UserForRequest " + userForRequest + "Username: " + username)
 			if (!Array.isArray(requests) || requests.length === 0) {
-				console.log("UserForRequest " + userForRequest)
+				console.log("Request is empty ")
 				incomingDiv.innerHTML = '<em>Keine offenen Anfragen.</em>';
 				return;
 			}
-			console.log("UserForRequest " + userForRequest)
+			console.log("UserForRequest " + userForRequest + "Username: " + username)
 			incomingDiv.innerHTML = '';
 			requests.forEach(req => {
 				console.log("REQ.USERNAME " + req.username + " req.followerUrl " + req.followerUrl)
