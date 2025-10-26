@@ -99,8 +99,12 @@ const userForRequest = username;
 function loadFollowRequests() {
 	incomingDiv.innerHTML = 'Lade Anfragen...';
 	fetch(`/users/`+  userForRequest + `/followRequests`)
-		.then(res => res.json())
+		.then(res => {
+			console.log("RES: ", res)
+			return res.json();
+		})
 		.then(requests => {
+			console.log("REQUESTS", requests)
 			console.log("UserForRequest " + userForRequest + "Username: " + username)
 			if (!Array.isArray(requests) || requests.length === 0) {
 				console.log("Request is empty ")
