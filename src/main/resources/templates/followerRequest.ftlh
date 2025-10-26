@@ -102,6 +102,7 @@ function loadFollowRequests() {
 		.then(requests => {
 			console.log("UserForRequest " + userForRequest)
 			if (!Array.isArray(requests) || requests.length === 0) {
+				console.log("UserForRequest " + userForRequest)
 				incomingDiv.innerHTML = '<em>Keine offenen Anfragen.</em>';
 				return;
 			}

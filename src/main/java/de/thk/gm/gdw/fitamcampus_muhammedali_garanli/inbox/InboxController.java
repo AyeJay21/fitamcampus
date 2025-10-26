@@ -87,15 +87,8 @@ public class InboxController {
                 messageService.saveMessage(sender, receiver, text, date);
             }
             if ("Follow".equals(type)) {
-                String receiver = null;
-
-                Object toObj = objectMap.get("to");
-                if (toObj instanceof List<?> toList && !toList.isEmpty()) {
-                    receiver = toList.get(0).toString();
-                } else if (toObj instanceof String s) {
-                    receiver = s;
-                }
-                followerService.saveOutsideFollowRequest(username, receiver, type);
+                String followerUrl = (String) activity.get("actor");
+                followerService.saveOutsideFollowRequest(username, followerUrl, type);
             }
         }
 
