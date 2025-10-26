@@ -86,8 +86,10 @@ public class InboxController {
 
                 messageService.saveMessage(sender, receiver, text, date);
             }
+            System.out.println("========================================");
             if ("Follow".equals(type)) {
                 String followerUrl = (String) activity.get("actor");
+                System.out.println("================= FOLLOWER URL=======================: " + followerUrl);
                 followerService.saveOutsideFollowRequest(username, followerUrl, type);
             }
         }
