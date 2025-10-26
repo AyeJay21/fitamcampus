@@ -21,7 +21,7 @@ public class FollowerService {
         followRequestRepository.save(followRequest);
     }
 
-    public List<?> getFollowerRequest(String username){
+    public List<FollowRequest> getFollowerRequest(String username){
         return followRequestRepository.findByUsername(username);
     }
 }
