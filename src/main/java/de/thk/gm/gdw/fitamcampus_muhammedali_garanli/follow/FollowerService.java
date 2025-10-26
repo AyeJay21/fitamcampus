@@ -22,6 +22,11 @@ public class FollowerService {
     }
 
     public List<FollowRequest> getFollowerRequest(String username){
-        return followRequestRepository.findByUsername(username);
+        System.out.println("======== Get FollowerRequest ========");
+        List<FollowRequest> requests = followRequestRepository.findByUsername(username);
+        for (FollowRequest req : requests) {
+            System.out.println("id=" + req.getId() + ", username=" + req.getUsername() + ", followerUrl=" + req.getFollowerUrl() + ", type=" + req.getType());
+        }
+        return requests;
     }
 }
