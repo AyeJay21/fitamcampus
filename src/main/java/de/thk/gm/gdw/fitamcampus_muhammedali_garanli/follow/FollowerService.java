@@ -17,7 +17,7 @@ public class FollowerService {
         followRequest.setUsername(username);
         followRequest.setFollowerUrl(receiver);
         followRequest.setType(type);
-
+        System.out.println("Request succesfully saved in followRequest");
         followRequestRepository.save(followRequest);
     }
 
