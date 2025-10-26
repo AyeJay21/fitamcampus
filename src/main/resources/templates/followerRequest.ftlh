@@ -91,7 +91,8 @@ document.getElementById('sendFollowForm').onsubmit = function(e) {
 };
 
 const incomingDiv = document.getElementById('incomingRequests');
-const username = (document.getElementById('currentUser') && document.getElementById('currentUser').textContent) || '';
+const username1 = (document.getElementById('currentUser') && document.getElementById('currentUser').textContent) || '';
+const username = "${username}";
 
 const userForRequest = username;
 
