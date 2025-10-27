@@ -117,24 +117,24 @@ function loadFollowRequests() {
 				console.log("REQ.USERNAME " + req.username + " req.followerUrl " + req.followerUrl)
 				const div = document.createElement('div');
 				div.className = 'request-item';
-				var name = req.user || req.username || req.actor || req.follower || req.followerUrl || JSON.stringify(req);
-				var followerUrl = req.followerUrl || req.actor || req.user || req.follower || name;
-				div.innerHTML = '<span>' + name + '</span>' +
+				let name = req.username;
+				let followerUrl = req.followerUrl;
+				div.innerHTML = '<span>' + followerUrl + '</span>' +
 					'<button style="margin-left:8px;" class="accept-btn">Accept</button>' +
 					'<button style="margin-left:8px;" class="decline-btn">Decline</button>';
 				setTimeout(function() {
-					var acceptBtn = div.querySelector('.accept-btn');
-					var declineBtn = div.querySelector('.decline-btn');
+					let acceptBtn = div.querySelector('.accept-btn');
+					let declineBtn = div.querySelector('.decline-btn');
 					if (acceptBtn) {
 						acceptBtn.onclick = function() {
-							fetch('/users/${username}/followers/accept', {
+							fetch(`/users/` +username+`/followers/accept`, {
 								method: 'POST',
 								headers: { 'Content-Type': 'application/json' },
 								body: JSON.stringify({ username: username, followerUrl: followerUrl })
 							})
 							.then(res => res.json())
 							.then(data => {
-								fetch(`/users/${username}/followRequests/delete`, {
+								fetch(`/users/`+username+`/followRequests/delete`, {
 									method: 'DELETE',
 									headers: { 'Content-Type': 'application/json' },
 									body: JSON.stringify(followerUrl)
@@ -147,7 +147,7 @@ function loadFollowRequests() {
 					}
 					if (declineBtn) {
 						declineBtn.onclick = function() {
-							fetch(`/users/${username}/followRequests/delete`, {
+							fetch(`/users/`+username+`/followRequests/delete`, {
 								method: 'DELETE',
 								headers: { 'Content-Type': 'application/json' },
 								body: JSON.stringify(followerUrl)
