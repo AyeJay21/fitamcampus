@@ -84,6 +84,8 @@ public class FollowerController {
             followObj.put("object", actorId);
             accept.put("object", followObj);
 
+
+
             deliveryService.sendToInbox(targetInbox, accept, actorId, privateKey);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", "Follower accepted, but failed to federate: " + e.getMessage()));

@@ -99,10 +99,10 @@ const userForRequest = username;
 function loadFollowRequests() {
 	incomingDiv.innerHTML = 'Lade Anfragen...';
 	fetch(`/users/`+  userForRequest + `/followRequests`)
-		.then(res => {
-			console.log("RES: ", res)
-			return res.json();
-		})
+			.then(res => {
+				console.log("RES: ", res)
+				return res.json();
+			})
 		.then(requests => {
 			console.log("REQUESTS", requests)
 			console.log("UserForRequest " + userForRequest + "Username: " + username)
@@ -117,7 +117,46 @@ function loadFollowRequests() {
 				console.log("REQ.USERNAME " + req.username + " req.followerUrl " + req.followerUrl)
 				const div = document.createElement('div');
 				div.className = 'request-item';
-				div.innerHTML = `<span>` + req.username + `</span><span>` + req.followerUrl + `</span>`;
+				var name = req.user || req.username || req.actor || req.follower || req.followerUrl || JSON.stringify(req);
+				var followerUrl = req.followerUrl || req.actor || req.user || req.follower || name;
+				div.innerHTML = '<span>' + name + '</span>' +
+					'<button style="margin-left:8px;" class="accept-btn">Accept</button>' +
+					'<button style="margin-left:8px;" class="decline-btn">Decline</button>';
+				setTimeout(function() {
+					var acceptBtn = div.querySelector('.accept-btn');
+					var declineBtn = div.querySelector('.decline-btn');
+					if (acceptBtn) {
+						acceptBtn.onclick = function() {
+							fetch('/users/${username}/followers/accept', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ username: username, followerUrl: followerUrl })
+							})
+							.then(res => res.json())
+							.then(data => {
+								fetch(`/users/${username}/followRequests/delete`, {
+									method: 'DELETE',
+									headers: { 'Content-Type': 'application/json' },
+									body: JSON.stringify(followerUrl)
+								}).then(() => {
+									loadFollowRequests();
+								});
+							})
+							.catch(() => alert('Fehler beim Akzeptieren!'));
+						}
+					}
+					if (declineBtn) {
+						declineBtn.onclick = function() {
+							fetch(`/users/${username}/followRequests/delete`, {
+								method: 'DELETE',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify(followerUrl)
+							}).then(() => {
+								loadFollowRequests();
+							});
+						}
+					}
+				}, 0);
 				incomingDiv.appendChild(div);
 			});
 		})

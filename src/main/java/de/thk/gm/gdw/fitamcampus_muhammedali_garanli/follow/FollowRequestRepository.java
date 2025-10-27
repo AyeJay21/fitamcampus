@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface FollowRequestRepository extends JpaRepository<FollowRequest, Long> {
     List<FollowRequest> findByUsername(String username);
+    void deleteByUsernameAndFollowerUrl(String username, String followerUrl);
 }
