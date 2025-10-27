@@ -58,7 +58,6 @@ public class ChatController {
         if (receiver != null && !receiver.isBlank()) {
             String receiverUrl = receiver;
             final String receiverShort;
-            // Falls receiver eine URL ist, baue name@domain
             if (receiverUrl.startsWith("https://") && receiverUrl.contains("/users/")) {
                 String[] urlParts = receiverUrl.split("/users/");
                 if (urlParts.length == 2) {
@@ -70,7 +69,6 @@ public class ChatController {
                 receiverShort = null;
             }
 
-            // Hilfsfunktionen für alle Varianten des eigenen Users
             String usernameUrl = username.contains("@") ? toUrl.apply(username) : "https://activitypub.alluneedspot.com/users/" + username;
             String usernameShort = username.contains("@") ? username : null;
 

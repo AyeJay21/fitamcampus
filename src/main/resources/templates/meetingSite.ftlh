@@ -9,11 +9,11 @@
 <nav class="navbar">
     <div class="navbar-left">
         <a onclick="window.location.href='/users/chats'">Chat</a> |
-        <a href="/meetings" class="nav-link">🏠 Alle Meetings</a>
+        <a href="/meetings" class="nav-link">Alle Meetings</a>
     </div>
     <div class="navbar-right">
         <#if currentUser??>
-            <span class="nav-user">👤 ${currentUser.username}</span>
+            <span class="nav-user">${currentUser.username}</span>
             <a href="/logout" class="nav-link logout">Logout</a>
         </#if>
     </div>

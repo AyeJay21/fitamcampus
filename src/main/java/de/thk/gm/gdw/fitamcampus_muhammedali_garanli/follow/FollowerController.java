@@ -93,5 +93,4 @@ public class FollowerController {
 
         return ResponseEntity.ok(Map.of("success", true, "followerUrl", followerUrl));
     }
-
 }

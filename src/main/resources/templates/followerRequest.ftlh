@@ -82,16 +82,29 @@
 </div>
 
 <script>
-document.getElementById('sendFollowForm').onsubmit = function(e) {
-	e.preventDefault();
-	const user = document.getElementById('followUserInput').value.trim();
-	if (!user) return;
-	alert('Würde Anfrage an ' + user + ' senden (Endpoint folgt)');
-	document.getElementById('followUserInput').value = '';
-};
+	document.getElementById('sendFollowForm').onsubmit = function(e) {
+		e.preventDefault();
+		const user = document.getElementById('followUserInput').value.trim();
+		if (!user) return;
+		document.getElementById('followUserInput').value = '';
+
+		const fromUser = username;
+		const targetHandle = user;
+		const sendFollowRequest = {
+			fromUser: username,
+			targetHandle: user
+		}
+
+		fetch('/activitypub/send-follow', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(sendFollowRequest)
+		})
+				.then(res => res.json())
+				.catch(() => alert('Fehler beim Senden der Anfrage!'));
+	};
 
 const incomingDiv = document.getElementById('incomingRequests');
-const username1 = (document.getElementById('currentUser') && document.getElementById('currentUser').textContent) || '';
 const username = "${username}";
 
 const userForRequest = username;
@@ -104,17 +117,12 @@ function loadFollowRequests() {
 				return res.json();
 			})
 		.then(requests => {
-			console.log("REQUESTS", requests)
-			console.log("UserForRequest " + userForRequest + "Username: " + username)
 			if (!Array.isArray(requests) || requests.length === 0) {
-				console.log("Request is empty ")
 				incomingDiv.innerHTML = '<em>Keine offenen Anfragen.</em>';
 				return;
 			}
-			console.log("UserForRequest " + userForRequest + "Username: " + username)
 			incomingDiv.innerHTML = '';
 			requests.forEach(req => {
-				console.log("REQ.USERNAME " + req.username + " req.followerUrl " + req.followerUrl)
 				const div = document.createElement('div');
 				div.className = 'request-item';
 				let name = req.username;
