@@ -29,7 +29,7 @@ public class FollowRequestController {
     }
 
     @DeleteMapping("/users/{username}/followRequests/delete")
-    public void deleteFollowRequest(@PathVariable String username ,@RequestBody String followerUrl){
+    public void deleteFollowRequest(@PathVariable String username , @RequestBody String followerUrl){
         followRequestService.deleteFromFollowRequest(username, followerUrl);
     }
 }

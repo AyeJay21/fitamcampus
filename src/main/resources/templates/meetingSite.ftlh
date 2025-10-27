@@ -10,7 +10,6 @@
     <div class="navbar-left">
         <a onclick="window.location.href='/users/chats'">Chat</a> |
         <a href="/meetings" class="nav-link">🏠 Alle Meetings</a>
-        <a href="/meetingSite" class="nav-link">➕ Neues Meeting</a>
     </div>
     <div class="navbar-right">
         <#if currentUser??>
