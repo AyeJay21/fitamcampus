@@ -136,7 +136,6 @@
 <body>
 <h1>Chat</h1>
 
-
 <div class="mainContainer">
     <div class="followerContainer">
         <h3 class="username" id="currentUser">${username}</h3>
@@ -171,6 +170,26 @@
             return name + '@' + domain.replace('/', '');
         }
         return url;
+    }
+
+    function formatTime(ts) {
+        const d = new Date(ts || Date.now());
+        return d.getDate().toString().padStart(2, '0') + '.' +
+            (d.getMonth() + 1).toString().padStart(2, '0') + '.' +
+            d.getFullYear() + ' ' +
+            d.getHours().toString().padStart(2, '0') + ':' +
+            d.getMinutes().toString().padStart(2, '0');
+    }
+
+    function appendMessageToDom(msg) {
+        const div = document.createElement('div');
+        const formatted = formatTime(msg.timeStamp || Date.now());
+        const isOwn = (msg.sender === username);
+        div.className = 'message' + (isOwn ? ' own' : '');
+        const text = msg.text || msg.message || msg.content || '';
+        div.innerHTML = '<b>' + (isOwn ? 'Du' : msg.sender) + ':</b> ' + text + ' <small>' + formatted + '</small>';
+        messageList.appendChild(div);
+        messageList.scrollTop = messageList.scrollHeight;
     }
 
     const currentUser = document.getElementById('currentUser');
@@ -241,8 +260,8 @@
                             throw new Error(msg);
                         });
                     }
+                    appendMessageToDom({ sender: username, text: text, timeStamp: Date.now() });
                     input.value = '';
-                    loadMessages(username, receiverUrl, displayName);
                 })
                 .catch(function (e) {
                     alert('Fehler beim Senden der Nachricht: ' + e);

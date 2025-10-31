@@ -19,7 +19,6 @@ public class LoginController {
     @Autowired
     public ActorRepository actorRepository;
     
-    // GET für Login-Seite
     @GetMapping("/login")
     public String showLoginPage(Model model, 
                                @RequestParam(value = "error", required = false) String error,
@@ -41,7 +40,6 @@ public class LoginController {
         try {
             Actor actor = actorService.login(email, password);
             
-            // Session setzen
             session.setAttribute("loggedInUser", actor);
             session.setAttribute("userId", actor.getId());
             session.setAttribute("username", actor.getUsername());
@@ -60,12 +58,10 @@ public class LoginController {
         return "redirect:/login?message=Erfolgreich ausgeloggt";
     }
     
-    // Helper Methode um zu prüfen ob User eingeloggt ist
     public static boolean isLoggedIn(HttpSession session) {
         return session.getAttribute("loggedInUser") != null;
     }
     
-    // Helper Methode um aktuellen User zu holen
     public static Actor getCurrentUser(HttpSession session) {
         return (Actor) session.getAttribute("loggedInUser");
     }
