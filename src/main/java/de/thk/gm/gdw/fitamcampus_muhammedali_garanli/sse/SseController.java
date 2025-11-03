@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.ResponseEntity;
 import java.util.Map;
+import java.util.Date;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Controller
@@ -46,6 +48,20 @@ public class SseController {
             try { emitter.complete(); } catch (Exception ignored) {}
         }
         return emitter;
+    }
+
+    // quick test-push: trigger a server-side push into a room
+    @GetMapping("/sse/test-push")
+    public ResponseEntity<?> testPush(@RequestParam String room, @RequestParam(required = false, defaultValue = "test message") String text) {
+        log.info("SSE testPush requested for room={} text={}", room, text);
+        Map<String, Object> payload = Map.of(
+                "sender", "__server_test__",
+                "text", text,
+                "timeStamp", new Date().getTime(),
+                "room", room
+        );
+        sseService.pushToRoom(room, payload);
+        return ResponseEntity.ok(Map.of("pushed", true));
     }
 
 }
