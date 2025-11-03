@@ -36,6 +36,9 @@ public class InboxController {
     @Autowired
     public MessageService messageService;
 
+    @Autowired
+    private de.thk.gm.gdw.fitamcampus_muhammedali_garanli.sse.SseService sseService;
+
     private final FollowerRepository followerRepository;
 
     @GetMapping(produces = "application/json")
@@ -87,6 +90,18 @@ public class InboxController {
                 }
 
                 messageService.saveMessage(sender, receiver, text, date);
+                // push SSE to subscribers of the receiver (notify logged-in user sessions)
+                try {
+                    Map<String, Object> payload = Map.of(
+                            "sender", sender,
+                            "text", text,
+                            "timeStamp", date != null ? date.getTime() : new Date().getTime(),
+                            "room", receiver
+                    );
+                    sseService.pushToRoom(receiver, payload);
+                } catch (Exception e) {
+                    System.err.println("Failed to push SSE for incoming inbox message: " + e.getMessage());
+                }
             }
         }
         if ("Follow".equals(type)) {
