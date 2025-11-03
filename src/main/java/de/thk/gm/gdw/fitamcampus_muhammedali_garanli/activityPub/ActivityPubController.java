@@ -15,9 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.sse.SseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 public class ActivityPubController {
+
+    private static final Logger log = LoggerFactory.getLogger(ActivityPubController.class);
 
     @Autowired
     private ActorService actorService;
@@ -125,10 +129,13 @@ public class ActivityPubController {
                     "room", targetActorUrl
                 );
                 // notify recipient
+                log.info("Pushing SSE payload to recipientRoom={} and senderRoom={}; payload preview={}", targetActorUrl, actorId, message);
                 sseService.pushToRoom(targetActorUrl, payload);
                 // notify sender (other sessions of the same user)
                 sseService.pushToRoom(actorId, payload);
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                log.warn("Failed to push SSE payload: {}", e.getMessage());
+            }
 
             return ResponseEntity.ok(Map.of(
                 "success", true, 

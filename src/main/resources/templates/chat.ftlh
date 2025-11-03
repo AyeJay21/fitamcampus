@@ -301,20 +301,27 @@
                 const myActorUrl = 'https://activitypub.alluneedspot.com/users/' + encodeURIComponent(username);
                 currentRoom = myActorUrl;
                 try {
-                    currentES = new EventSource('/sse/stream?room=' + encodeURIComponent(myActorUrl));
+                    const esUrl = '/sse/stream?room=' + encodeURIComponent(myActorUrl);
+                    console.log('Opening SSE to', esUrl);
+                    currentES = new EventSource(esUrl);
+                    currentES.onopen = function() { console.log('SSE connection opened for', esUrl); };
                     currentES.addEventListener('message', function(e) {
+                        console.log('SSE raw payload:', e.data);
                         try {
                             const serverMsg = JSON.parse(e.data);
                             // simple dedupe: skip if last message matches sender+text
                             const last = messageList.lastElementChild;
                             const lastText = last ? last.innerText : '';
                             if (lastText && lastText.includes(serverMsg.text) && lastText.includes(serverMsg.sender)) {
+                                console.log('SSE dedupe: skipping duplicate', serverMsg);
                                 return;
                             }
                             appendMessageToDom({ sender: serverMsg.sender, text: serverMsg.text, timeStamp: serverMsg.timeStamp });
                         } catch (err) { console.error('Invalid SSE payload', err); }
                     });
                     currentES.onerror = function(err) { console.error('SSE error', err); };
+                    // optional: log when connection closed
+                    currentES.addEventListener('close', function() { console.log('SSE closed for', esUrl); });
                 } catch (err) {
                     console.error('Failed to open SSE', err);
                 }
