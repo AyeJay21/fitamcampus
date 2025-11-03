@@ -202,6 +202,9 @@
         loadFollowers(username);
     }
 
+    let currentES = null;
+    let currentRoom = null;
+
     function loadFollowers(username) {
         followerList.textContent = 'Lade Follower...';
         fetch(`/users/${username}/followers`)
@@ -231,6 +234,12 @@
     }
 
     function loadMessages(username, receiverUrl, displayName) {
+        // close previous SSE if open and room changed
+        if (currentES && currentRoom !== receiverUrl) {
+            try { currentES.close(); } catch (e) {}
+            currentES = null;
+            currentRoom = null;
+        }
         chatTitle.textContent = 'Chat mit ' + displayName;
         messageList.textContent = 'Lade Nachrichten...';
         const chatForm = document.getElementById('chatForm');
@@ -288,6 +297,26 @@
                     div.innerHTML = '<b>' + (isOwn ? 'Du' : msg.sender) + ':</b> ' + msg.text + ' <small>' + formatted + '</small>';
                     messageList.appendChild(div);
                 });
+                // after initial render, open SSE for this room
+                currentRoom = receiverUrl;
+                try {
+                    currentES = new EventSource('/sse/stream?room=' + encodeURIComponent(receiverUrl));
+                    currentES.addEventListener('message', function(e) {
+                        try {
+                            const serverMsg = JSON.parse(e.data);
+                            // simple dedupe: skip if last message matches sender+text
+                            const last = messageList.lastElementChild;
+                            const lastText = last ? last.innerText : '';
+                            if (lastText && lastText.includes(serverMsg.text) && lastText.includes(serverMsg.sender)) {
+                                return;
+                            }
+                            appendMessageToDom({ sender: serverMsg.sender, text: serverMsg.text, timeStamp: serverMsg.timeStamp });
+                        } catch (err) { console.error('Invalid SSE payload', err); }
+                    });
+                    currentES.onerror = function(err) { console.error('SSE error', err); };
+                } catch (err) {
+                    console.error('Failed to open SSE', err);
+                }
             })
             .catch(() => {
                 messageList.textContent = 'Fehler beim Laden der Nachrichten.';

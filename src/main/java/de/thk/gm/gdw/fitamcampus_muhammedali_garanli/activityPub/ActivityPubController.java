@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
+import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.sse.SseService;
 
 @RestController
 public class ActivityPubController {
@@ -31,6 +32,9 @@ public class ActivityPubController {
     private OutboxRepository outboxRepository;
     @Autowired
     public MessageService messageService;
+
+    @Autowired
+    private SseService sseService;
 
     @PostMapping("/activitypub/send-follow")
     public ResponseEntity<?> sendFollow(
@@ -70,7 +74,6 @@ public class ActivityPubController {
             String fromUser = request.getFromUser();
             String message = request.getMessage();
             String targetHandle = request.getTargetHandle();
-            List<UUID> meetingIds = request.getMeetingIds();
 
             System.out.println("FROMUSER: " + fromUser);
             Actor me = actorService.getActorByUsername(fromUser);
@@ -112,6 +115,17 @@ public class ActivityPubController {
 
             System.out.println("BackendEnd fromUser: " + fromUser + " targetHandle: " + targetHandle + " message: " + message);
             messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
+
+            // push to SSE subscribers for this conversation
+            try {
+                Map<String, Object> payload = Map.of(
+                    "sender", fromUser,
+                    "text", message,
+                    "timeStamp", new Date().getTime(),
+                    "room", targetActorUrl
+                );
+                sseService.pushToRoom(targetActorUrl, payload);
+            } catch (Exception ignored) {}
 
             return ResponseEntity.ok(Map.of(
                 "success", true, 
@@ -169,6 +183,16 @@ public class ActivityPubController {
             outboxRepository.save(outboxItem);
 
             messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
+
+            try {
+                Map<String, Object> payload = Map.of(
+                    "sender", fromUser,
+                    "text", message,
+                    "timeStamp", new Date().getTime(),
+                    "room", targetActorUrl
+                );
+                sseService.pushToRoom(targetActorUrl, payload);
+            } catch (Exception ignored) {}
 
             return ResponseEntity.ok(Map.of(
                 "success", true,
