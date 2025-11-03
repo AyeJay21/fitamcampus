@@ -297,10 +297,11 @@
                     div.innerHTML = '<b>' + (isOwn ? 'Du' : msg.sender) + ':</b> ' + msg.text + ' <small>' + formatted + '</small>';
                     messageList.appendChild(div);
                 });
-                // after initial render, open SSE for this room
-                currentRoom = receiverUrl;
+                // after initial render, open SSE for this user (subscribe to your own actor URL)
+                const myActorUrl = 'https://activitypub.alluneedspot.com/users/' + encodeURIComponent(username);
+                currentRoom = myActorUrl;
                 try {
-                    currentES = new EventSource('/sse/stream?room=' + encodeURIComponent(receiverUrl));
+                    currentES = new EventSource('/sse/stream?room=' + encodeURIComponent(myActorUrl));
                     currentES.addEventListener('message', function(e) {
                         try {
                             const serverMsg = JSON.parse(e.data);

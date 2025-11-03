@@ -116,7 +116,7 @@ public class ActivityPubController {
             System.out.println("BackendEnd fromUser: " + fromUser + " targetHandle: " + targetHandle + " message: " + message);
             messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
 
-            // push to SSE subscribers for this conversation
+            // push to SSE subscribers for this conversation (both recipient and sender)
             try {
                 Map<String, Object> payload = Map.of(
                     "sender", fromUser,
@@ -124,7 +124,10 @@ public class ActivityPubController {
                     "timeStamp", new Date().getTime(),
                     "room", targetActorUrl
                 );
+                // notify recipient
                 sseService.pushToRoom(targetActorUrl, payload);
+                // notify sender (other sessions of the same user)
+                sseService.pushToRoom(actorId, payload);
             } catch (Exception ignored) {}
 
             return ResponseEntity.ok(Map.of(
@@ -192,6 +195,7 @@ public class ActivityPubController {
                     "room", targetActorUrl
                 );
                 sseService.pushToRoom(targetActorUrl, payload);
+                sseService.pushToRoom(actorId, payload);
             } catch (Exception ignored) {}
 
             return ResponseEntity.ok(Map.of(
