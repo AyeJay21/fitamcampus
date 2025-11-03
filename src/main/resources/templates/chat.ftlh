@@ -297,7 +297,6 @@
                     div.innerHTML = '<b>' + (isOwn ? 'Du' : msg.sender) + ':</b> ' + msg.text + ' <small>' + formatted + '</small>';
                     messageList.appendChild(div);
                 });
-                // after initial render, open SSE for this user (subscribe to your own actor URL)
                 const myActorUrl = 'https://activitypub.alluneedspot.com/users/' + encodeURIComponent(username);
                 currentRoom = myActorUrl;
                 try {
@@ -320,7 +319,6 @@
                         } catch (err) { console.error('Invalid SSE payload', err); }
                     });
                     currentES.onerror = function(err) { console.error('SSE error', err); };
-                    // optional: log when connection closed
                     currentES.addEventListener('close', function() { console.log('SSE closed for', esUrl); });
                 } catch (err) {
                     console.error('Failed to open SSE', err);

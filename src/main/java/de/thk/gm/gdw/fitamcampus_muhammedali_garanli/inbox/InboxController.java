@@ -86,7 +86,15 @@ public class InboxController {
                 String text = (String) objectMap.get("content");
                 Date date = null;
                 if (objectMap.get("published") != null) {
-                    date = Date.from(Instant.parse(objectMap.get("published").toString()));
+                    try {
+                        date = Date.from(Instant.parse(objectMap.get("published").toString()));
+                    } catch (Exception ignored) {
+                        // ignore parse errors and fall back to now
+                    }
+                }
+                // Ensure a non-null timestamp so MessageService validation passes
+                if (date == null) {
+                    date = new Date();
                 }
 
                 messageService.saveMessage(sender, receiver, text, date);
