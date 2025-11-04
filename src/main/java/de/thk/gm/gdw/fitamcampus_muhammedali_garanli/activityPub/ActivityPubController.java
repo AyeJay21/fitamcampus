@@ -118,18 +118,11 @@ public class ActivityPubController {
             outboxRepository.save(outboxItem);
 
             System.out.println("BackendEnd fromUser: " + fromUser + " targetHandle: " + targetHandle + " message: " + message);
-            // Save message locally for remote recipients; for local recipients the InboxController will
-            // persist the incoming activity when it is POSTed to /inbox, so avoid double-saving here.
-            boolean isLocalRecipient = (targetInbox != null && targetInbox.contains("activitypub.alluneedspot.com"));
-            if (!isLocalRecipient) {
-                // use the create activity id for idempotency when saving
-                String activityId = createActivity.get("id") != null ? createActivity.get("id").toString() : null;
-                messageService.saveMessage(fromUser, targetActorUrl, message, new Date(), activityId);
-            } else {
-                log.info("Local recipient detected ({}); skipping local save — inbox will persist it.", targetInbox);
-            }
+            System.out.println("BackendEnd fromUser: " + fromUser + " targetHandle: " + targetHandle + " message: " + message);
+            // persist the message locally (sender outbox/history)
+            messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
 
-            // Only notify sender sessions here. Do NOT push to recipient room from the sender endpoint.
+            // push to SSE subscribers for this conversation (both recipient and sender)
             try {
                 Map<String, Object> payload = Map.of(
                     "sender", fromUser,
@@ -138,10 +131,13 @@ public class ActivityPubController {
                     "room", targetActorUrl,
                     "tempId", request.getTempId()
                 );
-                log.info("Pushing SSE payload to senderRoom={}; payload preview={}", actorId, message);
+                // notify recipient
+                log.info("Pushing SSE payload to recipientRoom={} and senderRoom={}; payload preview={}", targetActorUrl, actorId, message);
+                sseService.pushToRoom(targetActorUrl, payload);
+                // notify sender (other sessions of the same user)
                 sseService.pushToRoom(actorId, payload);
             } catch (Exception e) {
-                log.warn("Failed to push SSE payload to sender room: {}", e.getMessage());
+                log.warn("Failed to push SSE payload: {}", e.getMessage());
             }
 
             return ResponseEntity.ok(Map.of(
@@ -199,13 +195,7 @@ public class ActivityPubController {
             outboxItem.setActivity(createActivity);
             outboxRepository.save(outboxItem);
 
-            boolean isLocalRecipient = (targetInbox != null && targetInbox.contains("activitypub.alluneedspot.com"));
-            if (!isLocalRecipient) {
-                String activityId = createActivity.get("id") != null ? createActivity.get("id").toString() : null;
-                messageService.saveMessage(fromUser, targetActorUrl, message, new Date(), activityId);
-            } else {
-                log.info("Detected local recipient ({}); skipping duplicate save for direct message.", targetInbox);
-            }
+            messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
 
             try {
                 Map<String, Object> payload = Map.of(
@@ -215,7 +205,7 @@ public class ActivityPubController {
                     "room", targetActorUrl,
                     "tempId", request.getTempId()
                 );
-                // only notify sender sessions here; recipient will be notified via InboxController when it receives the activity
+                sseService.pushToRoom(targetActorUrl, payload);
                 sseService.pushToRoom(actorId, payload);
             } catch (Exception ignored) {}
 
