@@ -24,14 +24,14 @@ public class MessageService {
      * within the last 10 seconds, skip persisting to avoid duplicate entries coming
      * from both outbound and inbound ActivityPub flows.
      */
-    public void saveMessage(String sender, String reciever, String text, Date timeStamp) {
-        saveMessage(sender, reciever, text, timeStamp, null);
+    public boolean saveMessage(String sender, String reciever, String text, Date timeStamp) {
+        return saveMessage(sender, reciever, text, timeStamp, null);
     }
 
     /**
      * Save with optional ActivityPub activityId for idempotency.
      */
-    public void saveMessage(String sender, String reciever, String text, Date timeStamp, String activityId) {
+    public boolean saveMessage(String sender, String reciever, String text, Date timeStamp, String activityId) {
             if (sender == null || sender.isEmpty()) {
                 throw new IllegalArgumentException("Sender must not be null or empty");
             }
@@ -48,12 +48,12 @@ public class MessageService {
             String cleaned = text.replaceAll("<[^>]*>", "");
 
             // If activityId provided and we've already saved this activity, skip
-            if (activityId != null && !activityId.isBlank()) {
+                if (activityId != null && !activityId.isBlank()) {
                 try {
                     Optional<Message> existing = messageRepository.findByActivityId(activityId);
                     if (existing.isPresent()) {
-                        log.info("Skipping save: activityId already exists: {}", activityId);
-                        return;
+                            log.info("Skipping save: activityId already exists: {}", activityId);
+                            return false;
                     }
                 } catch (Exception e) {
                     log.warn("ActivityId lookup failed, continuing: {}", e.getMessage());
@@ -69,7 +69,7 @@ public class MessageService {
                         // if duplicate within 10 seconds, skip
                         if (diff <= 10_000L) {
                             log.info("Skipping duplicate message save for {} -> {} (within {} ms)", sender, reciever, diff);
-                            return;
+                            return false;
                         }
                     }
                 }
@@ -86,7 +86,8 @@ public class MessageService {
             if (activityId != null && !activityId.isBlank()) {
                 message.setActivityId(activityId);
             }
-            messageRepository.save(message);
+        messageRepository.save(message);
+        return true;
     }
 
 }

@@ -120,22 +120,26 @@ public class ActivityPubController {
             System.out.println("BackendEnd fromUser: " + fromUser + " targetHandle: " + targetHandle + " message: " + message);
             System.out.println("BackendEnd fromUser: " + fromUser + " targetHandle: " + targetHandle + " message: " + message);
             // persist the message locally (sender outbox/history)
-            messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
+            boolean saved = messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
 
             // push to SSE subscribers for this conversation (both recipient and sender)
             try {
-                Map<String, Object> payload = Map.of(
-                    "sender", fromUser,
-                    "text", message,
-                    "timeStamp", new Date().getTime(),
-                    "room", targetActorUrl,
-                    "tempId", request.getTempId()
-                );
-                // notify recipient
-                log.info("Pushing SSE payload to recipientRoom={} and senderRoom={}; payload preview={}", targetActorUrl, actorId, message);
-                sseService.pushToRoom(targetActorUrl, payload);
-                // notify sender (other sessions of the same user)
-                sseService.pushToRoom(actorId, payload);
+                if (saved) {
+                    Map<String, Object> payload = Map.of(
+                        "sender", fromUser,
+                        "text", message,
+                        "timeStamp", new Date().getTime(),
+                        "room", targetActorUrl,
+                        "tempId", request.getTempId()
+                    );
+                    // notify recipient
+                    log.info("Pushing SSE payload to recipientRoom={} and senderRoom={}; payload preview={}", targetActorUrl, actorId, message);
+                    sseService.pushToRoom(targetActorUrl, payload);
+                    // notify sender (other sessions of the same user)
+                    sseService.pushToRoom(actorId, payload);
+                } else {
+                    log.info("Message save skipped (duplicate); not pushing SSE for content={}", message);
+                }
             } catch (Exception e) {
                 log.warn("Failed to push SSE payload: {}", e.getMessage());
             }
@@ -195,18 +199,21 @@ public class ActivityPubController {
             outboxItem.setActivity(createActivity);
             outboxRepository.save(outboxItem);
 
-            messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
-
+            boolean saved2 = messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
             try {
-                Map<String, Object> payload = Map.of(
-                    "sender", fromUser,
-                    "text", message,
-                    "timeStamp", new Date().getTime(),
-                    "room", targetActorUrl,
-                    "tempId", request.getTempId()
-                );
-                sseService.pushToRoom(targetActorUrl, payload);
-                sseService.pushToRoom(actorId, payload);
+                if (saved2) {
+                    Map<String, Object> payload = Map.of(
+                        "sender", fromUser,
+                        "text", message,
+                        "timeStamp", new Date().getTime(),
+                        "room", targetActorUrl,
+                        "tempId", request.getTempId()
+                    );
+                    sseService.pushToRoom(targetActorUrl, payload);
+                    sseService.pushToRoom(actorId, payload);
+                } else {
+                    log.info("Message save skipped for direct message; not pushing SSE (duplicate)");
+                }
             } catch (Exception ignored) {}
 
             return ResponseEntity.ok(Map.of(

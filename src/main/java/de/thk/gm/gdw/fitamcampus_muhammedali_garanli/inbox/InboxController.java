@@ -97,15 +97,19 @@ public class InboxController {
 
                 // prefer the activity.id if present for idempotency
                 String activityId = activity.get("id") != null ? activity.get("id").toString() : null;
-                messageService.saveMessage(sender, receiver, text, date, activityId);
+                boolean saved = messageService.saveMessage(sender, receiver, text, date, activityId);
                 try {
-                    Map<String, Object> payload = Map.of(
-                            "sender", sender,
-                            "text", text,
-                            "timeStamp", date != null ? date.getTime() : new Date().getTime(),
-                            "room", receiver
-                    );
-                    sseService.pushToRoom(receiver, payload);
+                    if (saved) {
+                        Map<String, Object> payload = Map.of(
+                                "sender", sender,
+                                "text", text,
+                                "timeStamp", date != null ? date.getTime() : new Date().getTime(),
+                                "room", receiver
+                        );
+                        sseService.pushToRoom(receiver, payload);
+                    } else {
+                        System.out.println("Skipping SSE push for incoming inbox message because save was skipped (duplicate)");
+                    }
                 } catch (Exception e) {
                     System.err.println("Failed to push SSE for incoming inbox message: " + e.getMessage());
                 }
