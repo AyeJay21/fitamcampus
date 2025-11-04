@@ -1,11 +1,16 @@
 package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class MessageService {
+
+    private static final Logger log = LoggerFactory.getLogger(MessageService.class);
 
     private final MessageRepository messageRepository;
 
@@ -13,6 +18,12 @@ public class MessageService {
         this.messageRepository = messageRepository;
     }
 
+    /**
+     * Save a message with a lightweight deduplication check: if the most recent message
+     * from the same sender to the same receiver has identical text and was created
+     * within the last 10 seconds, skip persisting to avoid duplicate entries coming
+     * from both outbound and inbound ActivityPub flows.
+     */
     public void saveMessage(String sender, String reciever, String text, Date timeStamp){
             if (sender == null || sender.isEmpty()) {
                 throw new IllegalArgumentException("Sender must not be null or empty");
@@ -26,11 +37,31 @@ public class MessageService {
             if (timeStamp == null) {
                 throw new IllegalArgumentException("Timestamp must not be null");
             }
-            Message message = new Message();
 
+            String cleaned = text.replaceAll("<[^>]*>", "");
+
+            try {
+                Optional<Message> recent = messageRepository.findTopBySenderAndRecieverOrderByTimeStampDesc(sender, reciever);
+                if (recent.isPresent()) {
+                    Message last = recent.get();
+                    if (last.getText() != null && last.getText().equals(cleaned)) {
+                        long diff = Math.abs(timeStamp.getTime() - (last.getTimeStamp() != null ? last.getTimeStamp().getTime() : 0L));
+                        // if duplicate within 10 seconds, skip
+                        if (diff <= 10_000L) {
+                            log.info("Skipping duplicate message save for {} -> {} (within {} ms)", sender, reciever, diff);
+                            return;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // on any error while checking duplicates, fall back to saving the message
+                log.warn("Duplicate check failed, proceeding to save message: {}", e.getMessage());
+            }
+
+            Message message = new Message();
             message.setSender(sender);
             message.setReciever(reciever);
-            message.setText(text.replaceAll("<[^>]*>", ""));
+            message.setText(cleaned);
             message.setTimeStamp(timeStamp);
             messageRepository.save(message);
     }
