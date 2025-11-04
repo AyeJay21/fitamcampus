@@ -95,7 +95,9 @@ public class InboxController {
                     date = new Date();
                 }
 
-                messageService.saveMessage(sender, receiver, text, date);
+                // prefer the activity.id if present for idempotency
+                String activityId = activity.get("id") != null ? activity.get("id").toString() : null;
+                messageService.saveMessage(sender, receiver, text, date, activityId);
                 try {
                     Map<String, Object> payload = Map.of(
                             "sender", sender,
@@ -114,7 +116,7 @@ public class InboxController {
             followerService.saveOutsideFollowRequest(username, followerUrl, type);
         }
 
-        Inbox saved = inboxRepository.save(inbox);
+    inboxRepository.save(inbox);
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);

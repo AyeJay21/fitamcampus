@@ -122,7 +122,9 @@ public class ActivityPubController {
             // persist the incoming activity when it is POSTed to /inbox, so avoid double-saving here.
             boolean isLocalRecipient = (targetInbox != null && targetInbox.contains("activitypub.alluneedspot.com"));
             if (!isLocalRecipient) {
-                messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
+                // use the create activity id for idempotency when saving
+                String activityId = createActivity.get("id") != null ? createActivity.get("id").toString() : null;
+                messageService.saveMessage(fromUser, targetActorUrl, message, new Date(), activityId);
             } else {
                 log.info("Local recipient detected ({}); skipping local save — inbox will persist it.", targetInbox);
             }
@@ -199,7 +201,8 @@ public class ActivityPubController {
 
             boolean isLocalRecipient = (targetInbox != null && targetInbox.contains("activitypub.alluneedspot.com"));
             if (!isLocalRecipient) {
-                messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
+                String activityId = createActivity.get("id") != null ? createActivity.get("id").toString() : null;
+                messageService.saveMessage(fromUser, targetActorUrl, message, new Date(), activityId);
             } else {
                 log.info("Detected local recipient ({}); skipping duplicate save for direct message.", targetInbox);
             }

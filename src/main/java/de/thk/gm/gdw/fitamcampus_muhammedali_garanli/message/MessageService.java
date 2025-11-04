@@ -24,7 +24,14 @@ public class MessageService {
      * within the last 10 seconds, skip persisting to avoid duplicate entries coming
      * from both outbound and inbound ActivityPub flows.
      */
-    public void saveMessage(String sender, String reciever, String text, Date timeStamp){
+    public void saveMessage(String sender, String reciever, String text, Date timeStamp) {
+        saveMessage(sender, reciever, text, timeStamp, null);
+    }
+
+    /**
+     * Save with optional ActivityPub activityId for idempotency.
+     */
+    public void saveMessage(String sender, String reciever, String text, Date timeStamp, String activityId) {
             if (sender == null || sender.isEmpty()) {
                 throw new IllegalArgumentException("Sender must not be null or empty");
             }
@@ -39,6 +46,19 @@ public class MessageService {
             }
 
             String cleaned = text.replaceAll("<[^>]*>", "");
+
+            // If activityId provided and we've already saved this activity, skip
+            if (activityId != null && !activityId.isBlank()) {
+                try {
+                    Optional<Message> existing = messageRepository.findByActivityId(activityId);
+                    if (existing.isPresent()) {
+                        log.info("Skipping save: activityId already exists: {}", activityId);
+                        return;
+                    }
+                } catch (Exception e) {
+                    log.warn("ActivityId lookup failed, continuing: {}", e.getMessage());
+                }
+            }
 
             try {
                 Optional<Message> recent = messageRepository.findTopBySenderAndRecieverOrderByTimeStampDesc(sender, reciever);
@@ -63,6 +83,9 @@ public class MessageService {
             message.setReciever(reciever);
             message.setText(cleaned);
             message.setTimeStamp(timeStamp);
+            if (activityId != null && !activityId.isBlank()) {
+                message.setActivityId(activityId);
+            }
             messageRepository.save(message);
     }
 

@@ -15,6 +15,8 @@ public class Message {
     @Lob
     private String text;
     private Date timeStamp;
+    // optional ActivityPub activity id for idempotency across inbound/outbound flows
+    private String activityId;
 
 
     public String getSender() {
@@ -47,5 +49,13 @@ public class Message {
 
     public void setTimeStamp(Date timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public String getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
     }
 }

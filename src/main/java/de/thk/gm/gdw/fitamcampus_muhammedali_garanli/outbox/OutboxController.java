@@ -61,13 +61,15 @@ public class OutboxController {
         Outbox item = new Outbox();
         item.setActivity(activity);
 
-        if ("Note".equals(activity.get("type").toString())) {
+            if ("Note".equals(activity.get("type").toString())) {
             String sender = (String) activity.getOrDefault("attributedTo", activity.get("actor"));
             Map<String, Object> objectMap = (Map<String, Object>) activity.get("object");
             String content = (String) objectMap.get("content");
             Object toObj = activity.get("to");
             String reciever = (toObj instanceof List<?> && !((List<?>)toObj).isEmpty()) ? ((List<?>)toObj).get(0).toString() : toObj.toString();
-            messageService.saveMessage(sender, reciever, content, new Date());
+            // prefer top-level activity id if present
+            String activityId = activity.get("id") != null ? activity.get("id").toString() : null;
+            messageService.saveMessage(sender, reciever, content, new Date(), activityId);
 
         } else if ("Create".equals(activity.get("type")) && activity.get("object") instanceof Map) {
             Map<String, Object> objectMap = (Map<String, Object>) activity.get("object");
@@ -82,7 +84,9 @@ public class OutboxController {
             logger.info("[OUTBOX DEBUG] Sender: " + sender);
             logger.info("[OUTBOX DEBUG] Receiver: " + reciever);
             logger.info("[OUTBOX DEBUG] Content: " + content);
-            messageService.saveMessage(sender, reciever, content, new Date());
+            // prefer top-level activity id (the Create activity id) if present, otherwise fall back to object id
+            String activityId = activity.get("id") != null ? activity.get("id").toString() : (objectMap.get("id") != null ? objectMap.get("id").toString() : null);
+            messageService.saveMessage(sender, reciever, content, new Date(), activityId);
         }
 
         outboxRepository.save(item);

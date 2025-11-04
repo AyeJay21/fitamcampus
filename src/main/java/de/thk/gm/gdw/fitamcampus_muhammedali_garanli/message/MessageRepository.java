@@ -8,4 +8,5 @@ import java.util.Optional;
 @Repository
 public interface MessageRepository extends JpaRepository<Message,Long> {
 	Optional<Message> findTopBySenderAndRecieverOrderByTimeStampDesc(String sender, String reciever);
+	Optional<Message> findByActivityId(String activityId);
 }
