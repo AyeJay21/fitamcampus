@@ -139,7 +139,7 @@ public class ActivityPubController {
                     log.info("Pushing SSE payload to recipientRoom={} and senderRoom={}; payload preview={}", targetActorUrl, actorId, message);
                     sseService.pushToRoom(targetActorUrl, payload);
                     // notify sender (other sessions of the same user)
-                    sseService.pushToRoom(actorId, payload);
+                    //sseService.pushToRoom(actorId, payload);
                 } else {
                     log.info("Message save skipped (duplicate); not pushing SSE for content={}", message);
                 }
@@ -215,7 +215,7 @@ public class ActivityPubController {
                         "tempId", request.getTempId()
                     );
                     sseService.pushToRoom(targetActorUrl, payload);
-                    sseService.pushToRoom(actorId, payload);
+                    //sseService.pushToRoom(actorId, payload);
                 } else {
                     log.info("Message save skipped for direct message; not pushing SSE (duplicate)");
                 }
