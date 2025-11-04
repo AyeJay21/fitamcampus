@@ -95,17 +95,22 @@ public class InboxController {
                     date = new Date();
                 }
 
-                // use activity id for idempotency when saving inbound Create/Note
-                String activityId = activity.get("id") != null ? activity.get("id").toString() : null;
-                messageService.saveMessage(sender, receiver, text, date, activityId);
+                // try to capture activity id for idempotency (federation echo protection)
+                String activityId = (activity.get("id") instanceof String) ? (String) activity.get("id") : null;
+                boolean saved = messageService.saveMessage(sender, receiver, text, date, activityId);
                 try {
-                    Map<String, Object> payload = Map.of(
-                            "sender", sender,
-                            "text", text,
-                            "timeStamp", date != null ? date.getTime() : new Date().getTime(),
-                            "room", receiver
-                    );
-                    sseService.pushToRoom(receiver, payload);
+                    if (saved) {
+                        Map<String, Object> payload = Map.of(
+                                "sender", sender,
+                                "text", text,
+                                "timeStamp", date != null ? date.getTime() : new Date().getTime(),
+                                "room", receiver
+                        );
+                        sseService.pushToRoom(receiver, payload);
+                    } else {
+                        // skip SSE push for duplicate/incoming echo
+                        System.out.println("Inbox: skipping SSE push because message save returned false (duplicate or idempotent)");
+                    }
                 } catch (Exception e) {
                     System.err.println("Failed to push SSE for incoming inbox message: " + e.getMessage());
                 }
