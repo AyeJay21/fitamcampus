@@ -188,6 +188,9 @@
         div.className = 'message' + (isOwn ? ' own' : '');
         const text = msg.text || msg.message || msg.content || '';
         div.innerHTML = '<b>' + (isOwn ? 'Du' : msg.sender) + ':</b> ' + text + ' <small>' + formatted + '</small>';
+        if (msg.tempId) {
+            div.setAttribute('data-tempid', msg.tempId);
+        }
         messageList.appendChild(div);
         messageList.scrollTop = messageList.scrollHeight;
     }
@@ -249,10 +252,13 @@
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text) return;
+            // generate a temporary id for optimistic UI dedupe
+            const tempId = 't-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
             const sendNoteRequest = {
                 fromUser: username,
                 targetHandle: urlToHandle(receiverUrl),
-                message: text
+                message: text,
+                tempId: tempId
             };
             console.log("FrontEnd fromUser: " + sendNoteRequest.fromUser + " targetHandle: " + sendNoteRequest.targetHandle + " message: " + sendNoteRequest.message)
             fetch('/activitypub/send-private-message', {
@@ -269,7 +275,7 @@
                             throw new Error(msg);
                         });
                     }
-                    appendMessageToDom({ sender: username, text: text, timeStamp: Date.now() });
+                    appendMessageToDom({ sender: username, text: text, timeStamp: Date.now(), tempId: tempId });
                     input.value = '';
                 })
                 .catch(function (e) {
@@ -294,6 +300,8 @@
                         date.getMinutes().toString().padStart(2, '0');
                     let isOwn = (msg.sender == username);
                     div.className = 'message' + (isOwn ? ' own' : '');
+                    // include tempId if present from server
+                    if (msg.tempId) div.setAttribute('data-tempid', msg.tempId);
                     div.innerHTML = '<b>' + (isOwn ? 'Du' : msg.sender) + ':</b> ' + msg.text + ' <small>' + formatted + '</small>';
                     messageList.appendChild(div);
                 });
@@ -308,7 +316,17 @@
                         console.log('SSE raw payload:', e.data);
                         try {
                             const serverMsg = JSON.parse(e.data);
-                            // simple dedupe: skip if last message matches sender+text
+                            // if server includes tempId, match and update optimistic message instead of adding duplicate
+                            if (serverMsg.tempId) {
+                                const existing = messageList.querySelector('[data-tempid="' + serverMsg.tempId + '"]');
+                                if (existing) {
+                                    // update timestamp/text if needed and mark as confirmed
+                                    existing.innerHTML = '<b>' + (serverMsg.sender === username ? 'Du' : serverMsg.sender) + ':</b> ' + serverMsg.text + ' <small>' + formatTime(serverMsg.timeStamp) + '</small>';
+                                    existing.removeAttribute('data-tempid');
+                                    return;
+                                }
+                            }
+                            // fallback dedupe: skip if last message matches sender+text
                             const last = messageList.lastElementChild;
                             const lastText = last ? last.innerText : '';
                             if (lastText && lastText.includes(serverMsg.text) && lastText.includes(serverMsg.sender)) {

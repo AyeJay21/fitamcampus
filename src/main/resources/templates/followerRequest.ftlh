@@ -142,10 +142,11 @@ function loadFollowRequests() {
 							})
 							.then(res => res.json())
 							.then(data => {
+								// send plain text body so server receives the raw followerUrl (no extra quotes)
 								fetch(`/users/`+username+`/followRequests/delete`, {
 									method: 'DELETE',
-									headers: { 'Content-Type': 'application/json' },
-									body: JSON.stringify(followerUrl)
+									headers: { 'Content-Type': 'text/plain' },
+									body: followerUrl
 								}).then(() => {
 									loadFollowRequests();
 								});
@@ -155,10 +156,11 @@ function loadFollowRequests() {
 					}
 					if (declineBtn) {
 						declineBtn.onclick = function() {
+							// send plain text body so server receives the raw followerUrl (no extra quotes)
 							fetch(`/users/`+username+`/followRequests/delete`, {
 								method: 'DELETE',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify(followerUrl)
+								headers: { 'Content-Type': 'text/plain' },
+								body: followerUrl
 							}).then(() => {
 								loadFollowRequests();
 							});

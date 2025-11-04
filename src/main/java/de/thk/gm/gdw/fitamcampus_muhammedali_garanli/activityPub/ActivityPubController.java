@@ -126,7 +126,8 @@ public class ActivityPubController {
                     "sender", fromUser,
                     "text", message,
                     "timeStamp", new Date().getTime(),
-                    "room", targetActorUrl
+                    "room", targetActorUrl,
+                    "tempId", request.getTempId()
                 );
                 // notify recipient
                 log.info("Pushing SSE payload to recipientRoom={} and senderRoom={}; payload preview={}", targetActorUrl, actorId, message);
@@ -199,7 +200,8 @@ public class ActivityPubController {
                     "sender", fromUser,
                     "text", message,
                     "timeStamp", new Date().getTime(),
-                    "room", targetActorUrl
+                    "room", targetActorUrl,
+                    "tempId", request.getTempId()
                 );
                 sseService.pushToRoom(targetActorUrl, payload);
                 sseService.pushToRoom(actorId, payload);

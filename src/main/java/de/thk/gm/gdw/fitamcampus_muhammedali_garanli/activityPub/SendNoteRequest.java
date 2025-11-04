@@ -7,6 +7,7 @@ public class SendNoteRequest {
     private String message;
     private String targetHandle;
     private String fromUser;
+    private String tempId;
     private String instanceType;
     private List<UUID> meetingIds;
 
@@ -32,6 +33,14 @@ public class SendNoteRequest {
 
     public void setFromUser(String fromUser) {
         this.fromUser = fromUser;
+    }
+
+    public String getTempId() {
+        return tempId;
+    }
+
+    public void setTempId(String tempId) {
+        this.tempId = tempId;
     }
 
     public String getInstanceType() {

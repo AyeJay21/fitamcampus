@@ -89,16 +89,13 @@ public class InboxController {
                     try {
                         date = Date.from(Instant.parse(objectMap.get("published").toString()));
                     } catch (Exception ignored) {
-                        // ignore parse errors and fall back to now
                     }
                 }
-                // Ensure a non-null timestamp so MessageService validation passes
                 if (date == null) {
                     date = new Date();
                 }
 
                 messageService.saveMessage(sender, receiver, text, date);
-                // push SSE to subscribers of the receiver (notify logged-in user sessions)
                 try {
                     Map<String, Object> payload = Map.of(
                             "sender", sender,
