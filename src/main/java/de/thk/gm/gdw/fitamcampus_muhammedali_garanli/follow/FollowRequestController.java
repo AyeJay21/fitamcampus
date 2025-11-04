@@ -30,6 +30,14 @@ public class FollowRequestController {
 
     @DeleteMapping("/users/{username}/followRequests/delete")
     public void deleteFollowRequest(@PathVariable String username , @RequestBody String followerUrl){
+        if (followerUrl != null) {
+            followerUrl = followerUrl.trim();
+            // remove surrounding JSON quotes if present
+            if (followerUrl.startsWith("\"") && followerUrl.endsWith("\"")) {
+                followerUrl = followerUrl.substring(1, followerUrl.length() - 1);
+            }
+            followerUrl = followerUrl.trim();
+        }
         followRequestService.deleteFromFollowRequest(username, followerUrl);
     }
 }
