@@ -95,7 +95,9 @@ public class InboxController {
                     date = new Date();
                 }
 
-                messageService.saveMessage(sender, receiver, text, date);
+                // use activity id for idempotency when saving inbound Create/Note
+                String activityId = activity.get("id") != null ? activity.get("id").toString() : null;
+                messageService.saveMessage(sender, receiver, text, date, activityId);
                 try {
                     Map<String, Object> payload = Map.of(
                             "sender", sender,

@@ -184,10 +184,18 @@
     function appendMessageToDom(msg) {
         const div = document.createElement('div');
         const formatted = formatTime(msg.timeStamp || Date.now());
-        const isOwn = (msg.sender === username);
+        const isOwn = (msg.sender === username) || (myActorUrl && msg.sender === myActorUrl) || (typeof msg.sender === 'string' && username && msg.sender.endsWith('/users/' + username));
         div.className = 'message' + (isOwn ? ' own' : '');
         const text = msg.text || msg.message || msg.content || '';
-        div.innerHTML = '<b>' + (isOwn ? 'Du' : msg.sender) + ':</b> ' + text + ' <small>' + formatted + '</small>';
+        let displaySender = msg.sender;
+        try {
+            if (isOwn) {
+                displaySender = 'Du';
+            } else if (typeof msg.sender === 'string' && msg.sender.startsWith('http')) {
+                displaySender = urlToHandle(msg.sender);
+            }
+        } catch (err) { /* ignore */ }
+        div.innerHTML = '<b>' + displaySender + ':</b> ' + text + ' <small>' + formatted + '</small>';
         if (msg.tempId) {
             div.setAttribute('data-tempid', msg.tempId);
         }
@@ -201,6 +209,8 @@
     const messageList = document.getElementById('messageList');
 
     const username = currentUser.textContent === 'Laden...' ? null : currentUser.textContent;
+    // canonical actor URL for the logged-in user (used to compare sender forms)
+    const myActorUrl = username ? 'https://activitypub.alluneedspot.com/users/' + encodeURIComponent(username) : null;
     if (username) {
         loadFollowers(username);
     }
@@ -291,19 +301,8 @@
                 }
                 messageList.innerHTML = '';
                 msgs.forEach(msg => {
-                    let div = document.createElement('div');
-                    let date = new Date(msg.timeStamp);
-                    let formatted = date.getDate().toString().padStart(2, '0') + '.' +
-                        (date.getMonth() + 1).toString().padStart(2, '0') + '.' +
-                        date.getFullYear() + ' ' +
-                        date.getHours().toString().padStart(2, '0') + ':' +
-                        date.getMinutes().toString().padStart(2, '0');
-                    let isOwn = (msg.sender == username);
-                    div.className = 'message' + (isOwn ? ' own' : '');
-                    // include tempId if present from server
-                    if (msg.tempId) div.setAttribute('data-tempid', msg.tempId);
-                    div.innerHTML = '<b>' + (isOwn ? 'Du' : msg.sender) + ':</b> ' + msg.text + ' <small>' + formatted + '</small>';
-                    messageList.appendChild(div);
+                    // reuse client-side display logic
+                    appendMessageToDom(msg);
                 });
                 const myActorUrl = 'https://activitypub.alluneedspot.com/users/' + encodeURIComponent(username);
                 currentRoom = myActorUrl;
@@ -320,16 +319,19 @@
                             if (serverMsg.tempId) {
                                 const existing = messageList.querySelector('[data-tempid="' + serverMsg.tempId + '"]');
                                 if (existing) {
-                                    // update timestamp/text if needed and mark as confirmed
-                                    existing.innerHTML = '<b>' + (serverMsg.sender === username ? 'Du' : serverMsg.sender) + ':</b> ' + serverMsg.text + ' <small>' + formatTime(serverMsg.timeStamp) + '</small>';
+                                    // determine display name
+                                    const isOwn = (serverMsg.sender === username) || (myActorUrl && serverMsg.sender === myActorUrl) || (typeof serverMsg.sender === 'string' && username && serverMsg.sender.endsWith('/users/' + username));
+                                    const displayName = isOwn ? 'Du' : (typeof serverMsg.sender === 'string' && serverMsg.sender.startsWith('http') ? urlToHandle(serverMsg.sender) : serverMsg.sender);
+                                    existing.innerHTML = '<b>' + displayName + ':</b> ' + serverMsg.text + ' <small>' + formatTime(serverMsg.timeStamp) + '</small>';
                                     existing.removeAttribute('data-tempid');
                                     return;
                                 }
                             }
-                            // fallback dedupe: skip if last message matches sender+text
+                            // fallback dedupe: compare last message text + computed display name
                             const last = messageList.lastElementChild;
                             const lastText = last ? last.innerText : '';
-                            if (lastText && lastText.includes(serverMsg.text) && lastText.includes(serverMsg.sender)) {
+                            const serverDisplayName = (typeof serverMsg.sender === 'string' && serverMsg.sender.startsWith('http')) ? urlToHandle(serverMsg.sender) : serverMsg.sender;
+                            if (lastText && lastText.includes(serverMsg.text) && lastText.includes(serverDisplayName)) {
                                 console.log('SSE dedupe: skipping duplicate', serverMsg);
                                 return;
                             }

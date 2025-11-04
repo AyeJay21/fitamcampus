@@ -120,13 +120,15 @@ public class ActivityPubController {
             System.out.println("BackendEnd fromUser: " + fromUser + " targetHandle: " + targetHandle + " message: " + message);
             System.out.println("BackendEnd fromUser: " + fromUser + " targetHandle: " + targetHandle + " message: " + message);
             // persist the message locally (sender outbox/history)
-            boolean saved = messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
+            // persist using canonical actor id as sender (avoid storing short username)
+            boolean saved = messageService.saveMessage(actorId, targetActorUrl, message, new Date());
 
             // push to SSE subscribers for this conversation (both recipient and sender)
             try {
                 if (saved) {
                     Map<String, Object> payload = Map.of(
-                        "sender", fromUser,
+                        "sender", actorId,
+                        "senderHandle", fromUser,
                         "text", message,
                         "timeStamp", new Date().getTime(),
                         "room", targetActorUrl,
@@ -199,11 +201,12 @@ public class ActivityPubController {
             outboxItem.setActivity(createActivity);
             outboxRepository.save(outboxItem);
 
-            boolean saved2 = messageService.saveMessage(fromUser, targetActorUrl, message, new Date());
+            boolean saved2 = messageService.saveMessage(actorId, targetActorUrl, message, new Date());
             try {
                 if (saved2) {
                     Map<String, Object> payload = Map.of(
-                        "sender", fromUser,
+                        "sender", actorId,
+                        "senderHandle", fromUser,
                         "text", message,
                         "timeStamp", new Date().getTime(),
                         "room", targetActorUrl,
