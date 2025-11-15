@@ -59,7 +59,6 @@ public class RemoteActorService {
         String username = parts[0];
         String domain = parts[1];
 
-        // WebFinger abrufen
         String webfingerUrl = "https://" + domain + "/.well-known/webfinger?resource=acct:" + username + "@" + domain;
         WebClient client = WebClient.create(webfingerUrl);
         String response = client.get().retrieve().bodyToMono(String.class).block();

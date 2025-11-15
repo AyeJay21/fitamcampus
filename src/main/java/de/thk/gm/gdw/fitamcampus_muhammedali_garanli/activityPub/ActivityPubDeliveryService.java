@@ -39,7 +39,6 @@ public class ActivityPubDeliveryService {
         System.out.println("Body Preview: " + body.substring(0, Math.min(200, body.length())) + "...");
         System.out.println("========================================================");
 
-        // WebClient richtig konfigurieren - nur Schema+Host als baseUrl
         String baseUrl = url.getProtocol() + "://" + host;
         if (url.getPort() != -1) {
             baseUrl += ":" + url.getPort();
@@ -50,7 +49,7 @@ public class ActivityPubDeliveryService {
         try {
             System.out.println("Sending HTTP POST to: " + baseUrl + path);
             String response = clientFixed.post()
-                    .uri(path)  // Path separat angeben!
+                    .uri(path)
                     .header("Content-Type", "application/activity+json")
                     .header("Host", host)
                     .header("Date", signatureResult.date)

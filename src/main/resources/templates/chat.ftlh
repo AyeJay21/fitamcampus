@@ -209,7 +209,6 @@
     const messageList = document.getElementById('messageList');
 
     const username = currentUser.textContent === 'Laden...' ? null : currentUser.textContent;
-    // canonical actor URL for the logged-in user (used to compare sender forms)
     const myActorUrl = username ? 'https://activitypub.alluneedspot.com/users/' + encodeURIComponent(username) : null;
     if (username) {
         loadFollowers(username);
@@ -247,7 +246,6 @@
     }
 
     function loadMessages(username, receiverUrl, displayName) {
-        // close previous SSE if open and room changed
         if (currentES && currentRoom !== receiverUrl) {
             try { currentES.close(); } catch (e) {}
             currentES = null;
@@ -262,7 +260,6 @@
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text) return;
-            // generate a temporary id for optimistic UI dedupe
             const tempId = 't-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
             const sendNoteRequest = {
                 fromUser: username,
@@ -301,7 +298,6 @@
                 }
                 messageList.innerHTML = '';
                 msgs.forEach(msg => {
-                    // reuse client-side display logic
                     appendMessageToDom(msg);
                 });
                 const myActorUrl = 'https://activitypub.alluneedspot.com/users/' + encodeURIComponent(username);
@@ -315,11 +311,9 @@
                         console.log('SSE raw payload:', e.data);
                         try {
                             const serverMsg = JSON.parse(e.data);
-                            // if server includes tempId, match and update optimistic message instead of adding duplicate
                             if (serverMsg.tempId) {
                                 const existing = messageList.querySelector('[data-tempid="' + serverMsg.tempId + '"]');
                                 if (existing) {
-                                    // determine display name
                                     const isOwn = (serverMsg.sender === username) || (myActorUrl && serverMsg.sender === myActorUrl) || (typeof serverMsg.sender === 'string' && username && serverMsg.sender.endsWith('/users/' + username));
                                     const displayName = isOwn ? 'Du' : (typeof serverMsg.sender === 'string' && serverMsg.sender.startsWith('http') ? urlToHandle(serverMsg.sender) : serverMsg.sender);
                                     existing.innerHTML = '<b>' + displayName + ':</b> ' + serverMsg.text + ' <small>' + formatTime(serverMsg.timeStamp) + '</small>';
@@ -327,7 +321,6 @@
                                     return;
                                 }
                             }
-                            // fallback dedupe: compare last message text + computed display name
                             const last = messageList.lastElementChild;
                             const lastText = last ? last.innerText : '';
                             const serverDisplayName = (typeof serverMsg.sender === 'string' && serverMsg.sender.startsWith('http')) ? urlToHandle(serverMsg.sender) : serverMsg.sender;

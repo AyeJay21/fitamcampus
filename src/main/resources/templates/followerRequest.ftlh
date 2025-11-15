@@ -142,7 +142,6 @@ function loadFollowRequests() {
 							})
 							.then(res => res.json())
 							.then(data => {
-								// send plain text body so server receives the raw followerUrl (no extra quotes)
 								fetch(`/users/`+username+`/followRequests/delete`, {
 									method: 'DELETE',
 									headers: { 'Content-Type': 'text/plain' },

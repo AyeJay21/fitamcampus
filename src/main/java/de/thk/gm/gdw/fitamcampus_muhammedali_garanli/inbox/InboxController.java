@@ -95,7 +95,6 @@ public class InboxController {
                     date = new Date();
                 }
 
-                // try to capture activity id for idempotency (federation echo protection)
                 String activityId = (activity.get("id") instanceof String) ? (String) activity.get("id") : null;
                 boolean saved = messageService.saveMessage(sender, receiver, text, date, activityId);
                 try {
@@ -108,7 +107,6 @@ public class InboxController {
                         );
                         sseService.pushToRoom(receiver, payload);
                     } else {
-                        // skip SSE push for duplicate/incoming echo
                         System.out.println("Inbox: skipping SSE push because message save returned false (duplicate or idempotent)");
                     }
                 } catch (Exception e) {

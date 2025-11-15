@@ -47,7 +47,6 @@ public class MessageService {
 
             String cleaned = text.replaceAll("<[^>]*>", "");
 
-            // If activityId provided and we've already saved this activity, skip
                 if (activityId != null && !activityId.isBlank()) {
                 try {
                     Optional<Message> existing = messageRepository.findByActivityId(activityId);
@@ -66,7 +65,6 @@ public class MessageService {
                     Message last = recent.get();
                     if (last.getText() != null && last.getText().equals(cleaned)) {
                         long diff = Math.abs(timeStamp.getTime() - (last.getTimeStamp() != null ? last.getTimeStamp().getTime() : 0L));
-                        // if duplicate within 10 seconds, skip
                         if (diff <= 10_000L) {
                             log.info("Skipping duplicate message save for {} -> {} (within {} ms)", sender, reciever, diff);
                             return false;
@@ -74,7 +72,6 @@ public class MessageService {
                     }
                 }
             } catch (Exception e) {
-                // on any error while checking duplicates, fall back to saving the message
                 log.warn("Duplicate check failed, proceeding to save message: {}", e.getMessage());
             }
 

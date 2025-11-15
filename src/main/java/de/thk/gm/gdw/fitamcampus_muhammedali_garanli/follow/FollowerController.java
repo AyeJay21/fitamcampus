@@ -76,15 +76,15 @@ public class FollowerController {
             accept.put("id", actorId + "/activities/accept-" + UUID.randomUUID());
             accept.put("type", "Accept");
             accept.put("actor", actorId);
+
             Map<String, Object> followObj = new HashMap<>();
             followObj.put("@context", "https://www.w3.org/ns/activitystreams");
             //followObj.put("id", );
             followObj.put("type", "Follow");
             followObj.put("actor", targetActorUrl);
             followObj.put("object", actorId);
+
             accept.put("object", followObj);
-
-
 
             deliveryService.sendToInbox(targetInbox, accept, actorId, privateKey);
         } catch (Exception e) {

@@ -86,7 +86,6 @@ public class ActivityPubController {
             String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
 
             String targetInbox = remoteActorService.resolveActorInbox(targetHandle);
-
             String targetActorUrl = remoteActorService.resolveActorUrl(targetHandle);
 
             Map<String, Object> note = new HashMap<>();
@@ -119,12 +118,9 @@ public class ActivityPubController {
 
             System.out.println("BackendEnd fromUser: " + fromUser + " targetHandle: " + targetHandle + " message: " + message);
             System.out.println("BackendEnd fromUser: " + fromUser + " targetHandle: " + targetHandle + " message: " + message);
-            // persist the message locally (sender outbox/history)
-            // persist using canonical actor id as sender (avoid storing short username)
             String activityId = (String) createActivity.get("id");
             boolean saved = messageService.saveMessage(actorId, targetActorUrl, message, new Date(), activityId);
 
-            // push to SSE subscribers for this conversation (both recipient and sender)
             try {
                 if (saved) {
                     Map<String, Object> payload = Map.of(
@@ -135,10 +131,8 @@ public class ActivityPubController {
                         "room", targetActorUrl,
                         "tempId", request.getTempId()
                     );
-                    // notify recipient
                     log.info("Pushing SSE payload to recipientRoom={} and senderRoom={}; payload preview={}", targetActorUrl, actorId, message);
                     sseService.pushToRoom(targetActorUrl, payload);
-                    // notify sender (other sessions of the same user)
                     //sseService.pushToRoom(actorId, payload);
                 } else {
                     log.info("Message save skipped (duplicate); not pushing SSE for content={}", message);
@@ -173,7 +167,6 @@ public class ActivityPubController {
             String targetInbox = remoteActorService.resolveActorInbox(targetHandle);
             String targetActorUrl = remoteActorService.resolveActorUrl(targetHandle);
 
-            // Private Erwähnung - nur an den Empfänger, aber mit Mention-Tag
             Map<String, Object> note = new HashMap<>();
             note.put("@context", "https://www.w3.org/ns/activitystreams");
             note.put("type", "Note");
@@ -181,7 +174,6 @@ public class ActivityPubController {
             note.put("content", message);
             note.put("attributedTo", actorId);
             note.put("to", Arrays.asList(targetActorUrl));
-            // Erwähnung hinzufügen für bessere Sichtbarkeit
             note.put("tag", Arrays.asList(Map.of(
                 "type", "Mention",
                 "href", targetActorUrl,
@@ -202,24 +194,23 @@ public class ActivityPubController {
             outboxItem.setActivity(createActivity);
             outboxRepository.save(outboxItem);
 
-            String activityId2 = (String) createActivity.get("id");
-            boolean saved2 = messageService.saveMessage(actorId, targetActorUrl, message, new Date(), activityId2);
-            try {
-                if (saved2) {
-                    Map<String, Object> payload = Map.of(
-                        "sender", actorId,
-                        "senderHandle", fromUser,
-                        "text", message,
-                        "timeStamp", new Date().getTime(),
-                        "room", targetActorUrl,
-                        "tempId", request.getTempId()
-                    );
-                    sseService.pushToRoom(targetActorUrl, payload);
-                    //sseService.pushToRoom(actorId, payload);
-                } else {
-                    log.info("Message save skipped for direct message; not pushing SSE (duplicate)");
-                }
-            } catch (Exception ignored) {}
+//            String activityId2 = (String) createActivity.get("id");
+//            boolean saved2 = messageService.saveMessage(actorId, targetActorUrl, message, new Date(), activityId2);
+//            try {
+//                if (saved2) {
+//                    Map<String, Object> payload = Map.of(
+//                        "sender", actorId,
+//                        "senderHandle", fromUser,
+//                        "text", message,
+//                        "timeStamp", new Date().getTime(),
+//                        "room", targetActorUrl,
+//                        "tempId", request.getTempId()
+//                    );
+//                    sseService.pushToRoom(targetActorUrl, payload);
+//                } else {
+//                    log.info("Message save skipped for direct message; not pushing SSE (duplicate)");
+//                }
+//            } catch (Exception ignored) {}
 
             return ResponseEntity.ok(Map.of(
                 "success", true,
