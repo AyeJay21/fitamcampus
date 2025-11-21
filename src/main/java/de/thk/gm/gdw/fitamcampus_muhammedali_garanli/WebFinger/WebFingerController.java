@@ -21,7 +21,7 @@ public class WebFingerController {
         this.actorRepository = actorRepository;
     }
 
-    @GetMapping(value = "/.well-known/webfinger", produces = "application/jrd+json")
+    @GetMapping(value = "/.well-known/webfinger", produces = {"application/jrd+json", "application/json"})
     public ResponseEntity<?> webfinger(@RequestParam String resource) {
         if (!resource.startsWith("acct:")) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid resource format"));

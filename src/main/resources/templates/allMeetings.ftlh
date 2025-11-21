@@ -264,20 +264,20 @@
                         </div>
                             <#if weathers[meeting.id]??>
                                 <#assign weather = weathers[meeting.id]>
-                                <div class="detail-item">
-                                    <div class="detail-label">Debug Wetter-Key</div>
-                                    <div class="detail-value">${meeting.id}</div>
-                                </div>
+<#--                                <div class="detail-item">-->
+<#--                                    <div class="detail-label">Debug Wetter-Key</div>-->
+<#--                                    <div class="detail-value">${meeting.id}</div>-->
+<#--                                </div>-->
                             </#if>
                         </div>
                         <div class="detail-item">
                             <div class="detail-label">Beschreibungs</div>
                             <div class="detail-value">${meeting.description}</div>
                         </div>
-                        <div class="detail-item">
-                            <div class="detail-label">MeetingID</div>
-                            <div class="detail-value">${meeting.id}</div>
-                        </div>
+<#--                        <div class="detail-item">-->
+<#--                            <div class="detail-label">MeetingID</div>-->
+<#--                            <div class="detail-value">${meeting.id}</div>-->
+<#--                        </div>-->
                         <#if weathers[meeting.id]??>
                         <#assign weather = weathers[meeting.id]>
                         <#if weather??>
@@ -327,7 +327,7 @@
                             <label class="meeting-checkbox">
                                 <input type="checkbox" name="meetingIds" value="${meeting.id}">
                                 <span class="checkmark"></span>
-                                ${meeting.name} (${meeting.date}, ${meeting.time})
+                                ${meeting.name}, ${meeting.sportArt} (${meeting.date}, ${meeting.time})
                             </label>
                         </#list>
                     <#else>
