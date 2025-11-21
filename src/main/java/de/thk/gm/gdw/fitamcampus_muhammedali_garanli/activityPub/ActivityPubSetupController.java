@@ -1,6 +1,7 @@
 package de.thk.gm.gdw.fitamcampus_muhammedali_garanli.activityPub;
 
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.Actor;
+import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.ActorDto;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.actor.ActorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,18 +19,16 @@ public class ActivityPubSetupController {
 
     @PostMapping(value = "/setup-actor", consumes = "application/json")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> setupActorJson(@RequestParam("username") String username,
-                                                              @RequestParam("email") String email,
-                                                              @RequestParam("password") String password) {
+    public ResponseEntity<Map<String, Object>> setupActorJson(@RequestBody ActorDto actorDto) {
 
         Map<String, Object> result = new HashMap<>();
         try {
-            Actor actor = actorService.createActor(username, email, password);
+            Actor actor = actorService.createActor(actorDto.getUsername(),actorDto.getEmail(),actorDto.getPassword());
             result.put("success", true);
             result.put("message", "Actor erfolgreich erstellt");
             result.put("username", actor.getUsername());
-            result.put("actorId", "https://activitypub.alluneedspot.com/users/" + username);
-            result.put("publicKeyId", "https://activitypub.alluneedspot.com/users/" + username + "#main-key");
+            result.put("actorId", "https://activitypub.alluneedspot.com/users/" + actorDto.getUsername());
+            result.put("publicKeyId", "https://activitypub.alluneedspot.com/users/" + actorDto.getUsername() + "#main-key");
             result.put("hasPrivateKey", actor.getPrivateKeyPem() != null);
             result.put("hasPublicKey", actor.getPublicKeyPem() != null);
         } catch (Exception e) {
