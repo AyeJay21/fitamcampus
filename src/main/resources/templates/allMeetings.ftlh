@@ -262,6 +262,10 @@
                             <div class="detail-label">Uhrzeit</div>
                             <div class="detail-value">${meeting.time}</div>
                         </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Sportart</div>
+                            <div class="detail-value">${meeting.sportArt}</div>
+                        </div>
                             <#if weathers[meeting.id]??>
                                 <#assign weather = weathers[meeting.id]>
 <#--                                <div class="detail-item">-->

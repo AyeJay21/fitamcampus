@@ -40,11 +40,9 @@ public class ActivityPubSetupController {
     }
 
     @PostMapping(value = "/setup-actor", consumes = "application/x-www-form-urlencoded")
-    public String setupActorForm(@RequestParam("username") String username,
-                                @RequestParam("email") String email,
-                                @RequestParam("password") String password) {
+    public String setupActorForm(@RequestBody ActorDto actorDto) {
         try {
-            actorService.createActor(username, email, password);
+            actorService.createActor(actorDto.getUsername(),actorDto.getEmail(),actorDto.getPassword());
             return "redirect:/";
         } catch (Exception e) {
             return "redirect:/register?error=" + e.getMessage();
