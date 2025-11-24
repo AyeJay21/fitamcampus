@@ -174,11 +174,11 @@ public class ActivityPubController {
             note.put("content", message);
             note.put("attributedTo", actorId);
             note.put("to", Arrays.asList(targetActorUrl));
-//            note.put("tag", Arrays.asList(Map.of(
-//                "type", "Mention",
-//                "href", targetActorUrl,
-//                "name", targetHandle
-//            )));
+            note.put("tag", Arrays.asList(Map.of(
+                "type", "Mention",
+                "href", targetActorUrl,
+                "name", targetHandle
+            )));
 
             Map<String, Object> createActivity = new HashMap<>();
             createActivity.put("@context", "https://www.w3.org/ns/activitystreams");
@@ -193,24 +193,6 @@ public class ActivityPubController {
             Outbox outboxItem = new Outbox();
             outboxItem.setActivity(createActivity);
             outboxRepository.save(outboxItem);
-
-//            String activityId2 = (String) createActivity.get("id");
-//            boolean saved2 = messageService.saveMessage(actorId, targetActorUrl, message, new Date(), activityId2);
-//            try {
-//                if (saved2) {
-//                    Map<String, Object> payload = Map.of(
-//                        "sender", actorId,
-//                        "senderHandle", fromUser,
-//                        "text", message,
-//                        "timeStamp", new Date().getTime(),
-//                        "room", targetActorUrl,
-//                        "tempId", request.getTempId()
-//                    );
-//                    sseService.pushToRoom(targetActorUrl, payload);
-//                } else {
-//                    log.info("Message save skipped for direct message; not pushing SSE (duplicate)");
-//                }
-//            } catch (Exception ignored) {}
 
             return ResponseEntity.ok(Map.of(
                 "success", true,
