@@ -174,11 +174,11 @@ public class ActivityPubController {
             note.put("content", message);
             note.put("attributedTo", actorId);
             note.put("to", Arrays.asList(targetActorUrl));
-            note.put("tag", Arrays.asList(Map.of(
-                "type", "Mention",
-                "href", targetActorUrl,
-                "name", targetHandle
-            )));
+//            note.put("tag", Arrays.asList(Map.of(
+//                "type", "Mention",
+//                "href", targetActorUrl,
+//                "name", targetHandle
+//            )));
 
             Map<String, Object> createActivity = new HashMap<>();
             createActivity.put("@context", "https://www.w3.org/ns/activitystreams");
