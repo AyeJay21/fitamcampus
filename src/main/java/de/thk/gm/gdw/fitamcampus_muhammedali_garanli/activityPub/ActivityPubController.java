@@ -190,7 +190,24 @@ public class ActivityPubController {
             createActivity.put("to", Arrays.asList(targetActorUrl));
 
             deliveryService.sendToInbox(targetInbox, createActivity, actorId, privateKey);
-            messageService.saveMessage(actorId, targetActorUrl, message, date, null);
+            String activityId2 = (String) createActivity.get("id");
+            boolean saved2 = messageService.saveMessage(actorId, targetActorUrl, message, new Date(), activityId2);
+            try {
+                if (saved2) {
+                    Map<String, Object> payload = Map.of(
+                            "sender", actorId,
+                            "senderHandle", fromUser,
+                            "text", message,
+                            "timeStamp", new Date().getTime(),
+                            "room", targetActorUrl,
+                            "tempId", request.getTempId()
+                    );
+                    sseService.pushToRoom(targetActorUrl, payload);
+                    //sseService.pushToRoom(actorId, payload);
+                } else {
+                    log.info("Message save skipped for direct message; not pushing SSE (duplicate)");
+                }
+            } catch (Exception ignored) {}
 
             Outbox outboxItem = new Outbox();
             outboxItem.setActivity(createActivity);
