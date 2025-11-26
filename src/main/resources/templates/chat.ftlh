@@ -215,7 +215,8 @@
     }
 
     let currentES = null;
-    let currentRoom = null;
+    let currentRoom = null; // subscription room (usually my actor URL)
+    let currentConversationPartner = null; // the actor URL of the currently open chat partner
 
     function loadFollowers(username) {
         followerList.textContent = 'Lade Follower...';
@@ -302,6 +303,7 @@
                 });
                 const myActorUrl = 'https://activitypub.alluneedspot.com/users/' + encodeURIComponent(username);
                 currentRoom = myActorUrl;
+                currentConversationPartner = receiverUrl;
                 try {
                     const esUrl = '/sse/stream?room=' + encodeURIComponent(myActorUrl);
                     console.log('Opening SSE to', esUrl);
@@ -321,13 +323,27 @@
                                     return;
                                 }
                             }
+                            const serverDisplayName = (typeof serverMsg.sender === 'string' && serverMsg.sender.startsWith('http')) ? urlToHandle(serverMsg.sender) : serverMsg.sender;
                             const last = messageList.lastElementChild;
                             const lastText = last ? last.innerText : '';
-                            const serverDisplayName = (typeof serverMsg.sender === 'string' && serverMsg.sender.startsWith('http')) ? urlToHandle(serverMsg.sender) : serverMsg.sender;
+
+                            const partner = currentConversationPartner;
+                            const isFromPartner = partner && serverMsg.sender === partner;
+                            const isToPartner = partner && serverMsg.room === partner;
+                            const isToMe = serverMsg.room === myActorUrl;
+                            const isFromMe = serverMsg.sender === myActorUrl || serverMsg.sender === username;
+                            const relevant = (partner && (isFromPartner || isToPartner)) || (isToMe && partner && (serverMsg.sender === partner || serverMsg.sender === urlToHandle(partner))) || (isFromMe && partner && serverMsg.room === partner);
+
+                            if (!relevant) {
+                                console.log('SSE message not for current conversation, ignoring', serverMsg);
+                                return;
+                            }
+
                             if (lastText && lastText.includes(serverMsg.text) && lastText.includes(serverDisplayName)) {
                                 console.log('SSE dedupe: skipping duplicate', serverMsg);
                                 return;
                             }
+
                             appendMessageToDom({ sender: serverMsg.sender, text: serverMsg.text, timeStamp: serverMsg.timeStamp });
                         } catch (err) { console.error('Invalid SSE payload', err); }
                     });
