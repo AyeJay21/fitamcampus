@@ -5,12 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class SseService {
 	private static final Logger log = LoggerFactory.getLogger(SseService.class);
-	private final java.util.concurrent.ConcurrentHashMap<String, CopyOnWriteArrayList<SseEmitter>> emitters = new java.util.concurrent.ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, CopyOnWriteArrayList<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
 	public void register(String roomId, SseEmitter emitter) {
 		emitters.computeIfAbsent(roomId, k -> new CopyOnWriteArrayList<>()).add(emitter);

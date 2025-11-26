@@ -5,6 +5,7 @@ import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.follow.FollowerRepository;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.follow.FollowerService;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message.Message;
 import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.message.MessageService;
+import de.thk.gm.gdw.fitamcampus_muhammedali_garanli.sse.SseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class InboxController {
     public MessageService messageService;
 
     @Autowired
-    private de.thk.gm.gdw.fitamcampus_muhammedali_garanli.sse.SseService sseService;
+    private SseService sseService;
 
     private final FollowerRepository followerRepository;
 

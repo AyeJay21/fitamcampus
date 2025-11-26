@@ -10,6 +10,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+
+import static java.security.MessageDigest.getInstance;
+
 @Service
 public class HttpSignatureService {
 
@@ -28,8 +31,7 @@ public class HttpSignatureService {
     public SignatureResult sign(String method, String path, String host, String body, String privateKeyPem, String actorId) throws Exception {
 
         // Digest des Bodys
-        String digest = "SHA-256=" + Base64.getEncoder().encodeToString(
-                java.security.MessageDigest.getInstance("SHA-256")
+        String digest = "SHA-256=" + Base64.getEncoder().encodeToString(getInstance("SHA-256")
                         .digest(body.getBytes(StandardCharsets.UTF_8))
         );
 

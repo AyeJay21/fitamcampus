@@ -55,7 +55,6 @@ public class ActivityPubDeliveryService {
                     .header("Date", signatureResult.date)
                     .header("Digest", signatureResult.digest)
                     .header("Signature", signatureResult.signature)
-                    .header("User-Agent", "FitamCampus-ActivityPub/1.0")
                     .bodyValue(body)
                     .retrieve()
                     .bodyToMono(String.class)
