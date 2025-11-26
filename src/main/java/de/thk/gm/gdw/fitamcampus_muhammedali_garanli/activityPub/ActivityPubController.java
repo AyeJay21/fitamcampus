@@ -163,6 +163,7 @@ public class ActivityPubController {
             Actor me = actorService.getActorByUsername(fromUser);
             String privateKey = me.getPrivateKeyPem();
             String actorId = "https://activitypub.alluneedspot.com/users/" + me.getUsername();
+            Date date = new Date();
 
             String targetInbox = remoteActorService.resolveActorInbox(targetHandle);
             String targetActorUrl = remoteActorService.resolveActorUrl(targetHandle);
@@ -189,6 +190,7 @@ public class ActivityPubController {
             createActivity.put("to", Arrays.asList(targetActorUrl));
 
             deliveryService.sendToInbox(targetInbox, createActivity, actorId, privateKey);
+            messageService.saveMessage(actorId, targetActorUrl, message, date, null);
 
             Outbox outboxItem = new Outbox();
             outboxItem.setActivity(createActivity);
